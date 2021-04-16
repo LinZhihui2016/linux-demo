@@ -14,6 +14,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  let ipStr =
+      req.ip ||
+      req.socket.remoteAddress
+  const ipReg = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/;
+  if (ipStr && ipStr.split(',').length > 0) {
+    ipStr = ipStr.split(',')[0]
+    const ip = ipReg.exec(ipStr);
+    console.log(ip)
+  }
+  next()
+})
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use((req, res, next) => next(createError(404)));

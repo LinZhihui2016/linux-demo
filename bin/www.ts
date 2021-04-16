@@ -8,15 +8,6 @@ const normalizePort = (val: string) => {
   if (port >= 0) return port;
   return false;
 };
-const debug = debug0('linux-demo:server');
-/**
- * Get port from environment and store in Express.
- */
-const port = normalizePort(process.env.PORT || '8808');
-app.set('port', port);
-
-const server = http.createServer(app);
-
 const onListening = () => {
   const addr = server.address();
   const bind = typeof addr === 'string'
@@ -24,7 +15,11 @@ const onListening = () => {
       : 'port ' + (addr && addr.port);
   debug('Listening on ' + bind);
 };
+const debug = debug0('linux-demo:server');
+const port = normalizePort(process.env.PORT || '8808');
+const server = http.createServer(app);
 
+app.set('port', port);
 server.listen(port);
 server.on('listening', onListening);
 
