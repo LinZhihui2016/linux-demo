@@ -5,6 +5,9 @@
   "repository": "git@github.com:LinZhihui2016/linux-demo.git",
   "author": "叶子 <519403248@qq.com>",
   "license": "MIT",
+"scripts":{
+	"start": "ts-node lesson1/simple_http_server.ts"
+},
   "dependencies": {
     "@types/node": "^14.14.41"
   }
