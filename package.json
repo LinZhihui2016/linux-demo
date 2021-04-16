@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "ts-node bin/www.ts"
+    "start": "ts-node bin/www.ts",
+    "serve": "nohup yarn start &!"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",
