@@ -14,6 +14,7 @@ const onListening = () => {
       ? 'pipe ' + addr
       : 'port ' + (addr && addr.port);
   debug('Listening on ' + bind);
+  console.log('Listening on ' + bind)
 };
 const debug = debug0('linux-demo:server');
 const port = normalizePort(process.env.PORT || '8808');
