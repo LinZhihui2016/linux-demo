@@ -1,3 +1,3 @@
 import { updateBv } from "../../task/bv.task";
 
-updateBv()
+updateBv().then(() => process.exit(1))

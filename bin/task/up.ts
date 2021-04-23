@@ -1,3 +1,3 @@
 import { updateUp } from "../../task/up.task";
 
-updateUp()
+updateUp().then(() => process.exit(1))
