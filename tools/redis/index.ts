@@ -50,3 +50,6 @@ export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S
     }
 export const isOK = (reply: string) => reply === 'OK'
 export const is1 = (reply: string | number) => (reply + '') === '1'
+
+export const
+    redisTask = (k: 'video' | 'up') => ['bilibili', 'task', k].join(':')

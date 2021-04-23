@@ -58,6 +58,7 @@ export const fetchBv = async (bv: string, count = 0): PRes<Bv> => {
   const dm = num(/([0-9]*)$/, $('.video-data .dm').attr('title'))
   const like = num(/([0-9]*)$/, $('.ops .like').attr('title'))
   const uploadTime = $('head meta[itemprop="uploadDate"]').attr('content') || ''
+
   return [null, {
     bv, title, mid: +midMatch[1], like, coin, collect, share, info, pic: pic ? pic.replace(/https?/, 'https') : '',
     view, dm, uploadTime, isFans: 0, created: $date(new Date(), 4)

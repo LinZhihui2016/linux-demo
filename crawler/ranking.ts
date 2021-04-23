@@ -3,6 +3,9 @@ import { api } from "../tools/axios";
 
 export interface Ranking {
   bvid: string
+  owner: {
+    mid: number
+  }
 }
 
 export enum RankId {

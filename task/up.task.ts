@@ -1,9 +1,9 @@
-import { $redis } from "../tools/redis";
+import { $redis, redisTask } from "../tools/redis";
 import * as upAction from "../api/up";
 import { sleep } from "../util";
 
 const map = new Map()
-const video_task = ['bilibili', 'task', 'up'].join(':')
+const video_task = redisTask('up')
 export const updateUp = async () => {
   const [, mid] = await $redis.getList(video_task).shift()
   if (mid) {

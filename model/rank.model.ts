@@ -5,12 +5,17 @@ import { Where } from "../tools/mysql/where";
 import { $mysql } from "../tools/mysql";
 import { apiLog } from "../util/log";
 import { MysqlError } from "mysql";
+import { $redis, redisTask } from "../tools/redis";
 
 export const fetchRank = async (rid: RankId): PRes<string[]> => {
   const [e, res] = await apiRank(rid)
   if (e) return [e, null]
   if (res && res.data) {
     const { data: { list } } = res
+    const bvList = list.map(i => i.bvid)
+    const upList = list.map(i => i.owner.mid + '')
+    await $redis.getList(redisTask('up')).push(upList)
+    await $redis.getList(redisTask('video')).push(bvList)
     return [null, list.map(i => i.bvid)]
   } else {
     apiLog().error(rid + ' 没有列表')
