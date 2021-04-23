@@ -2,5 +2,5 @@
 /conf/*.json
 /.idea/
 .log
-error.log
 .DS_Store
+error.log
