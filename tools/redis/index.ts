@@ -5,6 +5,7 @@ import { RedisHash } from "./hash";
 import { RedisKey } from "./key";
 import redisConf from '../../conf/redis.json'
 import { RequestHandler } from "express";
+import { apiLog } from "../../util/log";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -43,6 +44,9 @@ export const setupRedis: RequestHandler = (req, res, next) => {
   next()
 }
 export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S) => any) =>
-    (err: Error | null, reply: S) => resolve([err, fn ? fn(reply) : reply])
+    (err: Error | null, reply: S) => {
+      err && apiLog().error(err.message)
+      resolve([err, fn ? fn(reply) : reply])
+    }
 export const isOK = (reply: string) => reply === 'OK'
 export const is1 = (reply: string | number) => (reply + '') === '1'

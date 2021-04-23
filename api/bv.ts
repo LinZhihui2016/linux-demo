@@ -25,6 +25,7 @@ export const postAdd: Action<{ bv: string }> = async ({ bv, noCache }) => {
     bvObj = data
   }
   if (bvObj) {
+    await $redis.getList(['bilibili', 'task', 'up'].join(':')).push(bvObj.mid + '')
     const [err] = await saveBv(bvObj)
     return err ? error(Err.mysql写入失败, err.sql) : success({ bvObj })
   } else {

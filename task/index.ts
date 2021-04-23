@@ -1,8 +1,9 @@
 import { $redis } from "../tools/redis";
 import { $mysql } from "../tools/mysql";
-import { getTodayRank } from "../model/rank.model";
-import { addBvList } from "../model/bv.model";
-import { apiLog } from "../util/log";
+import { saveTodayRank } from "./rank.task";
+import schedule from "node-schedule";
+import { updateBv } from "./bv.task";
+import { updateUp } from "./up.task";
 
 export const taskInit = () => {
   const timer = setInterval(async () => {
@@ -16,10 +17,7 @@ export const taskInit = () => {
 }
 
 export const taskStart = async () => {
-  // await saveTodayRank()
-  const [err, bvs] = await getTodayRank()
-  err && apiLog().error(err.sql)
-  if (bvs) {
-    await addBvList(bvs)
-  }
+  schedule.scheduleJob('*50***', saveTodayRank) //每日0点5分开始采集排行榜
+  schedule.scheduleJob('*1****', updateBv)
+  schedule.scheduleJob('*1****', updateUp)
 }

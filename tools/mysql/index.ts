@@ -5,6 +5,7 @@ import { Query } from "./query";
 import { Where } from "./where";
 import { Type } from "../../type";
 import { $date } from "../../util/date";
+import { apiLog } from "../../util/log";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -19,7 +20,8 @@ export class Mysql {
   constructor(public option: { host: string, user: string, password: string }, public database: string) {
     const { host, user, password } = option
     this.connection = mysql.createConnection({
-      host, user, password, database
+      host, user, password, database,
+      charset: 'utf8mb4'
     })
     this.connection.connect((err) => {
       if (err) {
@@ -63,4 +65,7 @@ export const setupMysql: RequestHandler = (req, res, next) => {
 export type MysqlCb<T> = [MysqlError | null, T[]]
 export type MysqlPromise<T> = Promise<MysqlCb<T>>
 export const mysqlRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S) => any) =>
-    (err: MysqlError | null, result: S) => resolve([err, fn ? fn(result) : result])
+    (err: MysqlError | null, result: S) => {
+      err && apiLog().error(err.sql)
+      resolve([err, fn ? fn(result) : result])
+    }
