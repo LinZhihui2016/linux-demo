@@ -47,6 +47,9 @@ export const getPaging: Action<{ rid: RankId, date: string }> = async ({ rid, da
   if (err) {
     return error(Err.mysql读取失败, err.message)
   }
+  if (list.length !== 1){
+    return error(Err.mysql读取失败, '日期或rid错误')
+  }
   const bvs = list[0].LIST.split(',')
   const w = new Where().in('bv', bvs)
   const [err2, bvList] = await $mysql.query<{ BV: string, TITLE: string, MID: number, PIC: string }>('video').select(['bv', 'title', 'mid', 'pic']).where(w).find()
