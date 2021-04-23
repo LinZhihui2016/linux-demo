@@ -2,7 +2,7 @@ import { Action } from "../type";
 import { error, success } from "../helper";
 import { Err } from "../util/error";
 import { Bv, fetchBv, saveBv } from "../model/bv.model";
-import { $redis, redisTask } from "../tools/redis";
+import { $redis } from "../tools/redis";
 import { HOUR } from "../util";
 
 export const postAdd: Action<{ bv: string }> = async ({ bv, noCache }) => {
@@ -25,7 +25,6 @@ export const postAdd: Action<{ bv: string }> = async ({ bv, noCache }) => {
     bvObj = data
   }
   if (bvObj) {
-    await $redis.getList(redisTask('up')).push(bvObj.mid + '')
     const [err] = await saveBv(bvObj)
     return err ? error(Err.mysql写入失败, err.sql) : success({ bvObj })
   } else {
