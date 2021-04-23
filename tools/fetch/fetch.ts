@@ -5,6 +5,7 @@ import { sleep } from "../../util";
 import qs from "qs";
 import { ajaxLog } from "../../util/chalk";
 import { $redis } from "../redis";
+const HttpsProxyAgent = require('https-proxy-agent');
 
 export class NodeFetch {
   options: RequestInit;
@@ -25,6 +26,7 @@ export class NodeFetch {
         headers: {
           cookie
         },
+        agent: new HttpsProxyAgent('27.147.219.46:8080'),
         method,
         body: method === 'GET' ? JSON.stringify(data) : undefined
       })

@@ -1,5 +1,6 @@
 import { sleepLog } from "./chalk";
 import dayjs from "dayjs";
+import { Type } from "../type";
 
 export const arrayExclude = <T>(target: T[], exclude: T[]): T[] => {
   const res: T[] = [];
@@ -27,6 +28,18 @@ export const transWan = (str: string) => {
   }
 }
 
+export function lowerCaseKeys(key: string, value: any) {
+  if (value && typeof value === 'object') {
+    const replacement: Type.Obj<any> = {};
+    for (const k in value) {
+      if (Object.hasOwnProperty.call(value, k)) {
+        replacement[k.toLowerCase()] = value[k];
+      }
+    }
+    return replacement;
+  }
+  return value;
+}
 export const MINUTE = 60
 export const HOUR = MINUTE * 60
 export const DAY = HOUR * 24

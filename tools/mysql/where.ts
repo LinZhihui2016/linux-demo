@@ -9,14 +9,13 @@ export class Where {
   }
 
   in(key: string, values: (string[] | number[]), not = false) {
-    this.arr.push(not ? `not ` : '' + `${ key } in (${ values.join(',') })`)
+    this.arr.push(not ? `not ` : '' + `${ key } in (${ values.map((i: any) => `'${ i }'`).join(',') })`)
     return this
   }
 
   between(key: string, min: number, max: number, not = false) {
     this.arr.push(not ? `not ` : '' + `${ key } between ${ min } and ${ max }`)
     return this
-
   }
 
   gt(key: string, value: number | string, not = false) {
