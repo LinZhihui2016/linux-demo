@@ -6,6 +6,7 @@ import { Where } from "./where";
 import { Type } from "../../type";
 import { $date } from "../../util/date";
 import { apiLog } from "../../util/log";
+import { infoLog } from "../../util/chalk";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -28,6 +29,7 @@ export class Mysql {
         console.error('error connecting: ' + err.stack);
         return;
       }
+      infoLog(`mysql connect ${ host } ${ user } OK`)
       this.isConnect = true
     });
   }

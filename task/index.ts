@@ -17,7 +17,7 @@ export const taskInit = () => {
 }
 
 export const taskStart = async () => {
-  schedule.scheduleJob('*50***', saveTodayRank) //每日0点5分开始采集排行榜
-  schedule.scheduleJob('*10****', updateBv)
-  schedule.scheduleJob('*10****', updateUp)
+  schedule.scheduleJob('* 5 0 * * *', saveTodayRank) //每日0点5分开始采集排行榜
+  schedule.scheduleJob('* 15 * * * *', updateBv)
+  schedule.scheduleJob('* 15 * * * *', updateUp)
 }
