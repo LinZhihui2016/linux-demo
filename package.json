@@ -22,6 +22,7 @@
     "@types/redis": "^2.8.28",
     "axios": "^0.21.1",
     "axios-retry": "^3.1.9",
+    "chalk": "^4.1.1",
     "cheerio": "^1.0.0-rc.6",
     "cookie-parser": "~1.4.4",
     "dayjs": "^1.10.4",
