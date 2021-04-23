@@ -4,6 +4,7 @@ import { saveTodayRank } from "./rank.task";
 import schedule from "node-schedule";
 import { updateBv } from "./bv.task";
 import { updateUp } from "./up.task";
+import { infoLog } from "../util/chalk";
 
 export const taskInit = () => {
   const timer = setInterval(async () => {
@@ -17,7 +18,16 @@ export const taskInit = () => {
 }
 
 export const taskStart = async () => {
-  schedule.scheduleJob('* 5 0 * * *', saveTodayRank) //每日0点5分开始采集排行榜
-  schedule.scheduleJob('* 15 * * * *', updateBv)
-  schedule.scheduleJob('* 15 * * * *', updateUp)
+  schedule.scheduleJob('* 5 0 * * *', ()=> {
+    infoLog('saveTodayRank start')
+    saveTodayRank()
+  }) //每日0点5分开始采集排行榜
+  schedule.scheduleJob('* 20 * * * *', ()=> {
+    infoLog('updateBv start')
+    updateBv()
+  })
+  schedule.scheduleJob('* 30 * * * *', ()=> {
+    infoLog('updateUp start')
+    updateUp()
+  })
 }
