@@ -5,7 +5,6 @@ import { sleep } from "../../util";
 import qs from "qs";
 import { ajaxLog } from "../../util/chalk";
 import { $redis } from "../redis";
-const HttpsProxyAgent = require('https-proxy-agent');
 
 export class NodeFetch {
   options: RequestInit;
@@ -16,7 +15,7 @@ export class NodeFetch {
 
   $ = async (url: string, data?: Type.Obj<string | number | undefined>, opt?: RequestInit): PRes<string> => {
     const { method = 'GET' } = opt || {}
-    await sleep(1000)
+    await sleep(5000)
     const u = this.baseUrl + '/' + url + (method === 'GET' ? '?' + qs.stringify(data) : '')
     ajaxLog('fetch：' + u)
     const cookie = (await $redis.str.get(['bilibili', 'cookie'].join(':')))[1] || ''
@@ -26,7 +25,6 @@ export class NodeFetch {
         headers: {
           cookie
         },
-        agent: new HttpsProxyAgent('27.147.219.46:8080'),
         method,
         body: method === 'GET' ? JSON.stringify(data) : undefined
       })
