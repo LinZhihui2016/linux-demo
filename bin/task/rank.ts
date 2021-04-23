@@ -1,3 +1,3 @@
 import { saveTodayRank } from "../../task/rank.task";
 
-saveTodayRank()
+saveTodayRank().then(() => process.exit(1))
