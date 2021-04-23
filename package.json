@@ -4,8 +4,10 @@
   "private": true,
   "scripts": {
     "start": "ts-node bin/www.ts",
-    "task": "ts-node bin/task.ts",
-    "dev": "ts-node bin/script.ts"
+    "dev": "ts-node bin/script.ts",
+    "task:bv": "ts-node bin/task/bv.ts",
+    "task:up": "ts-node bin/task/up.ts",
+    "task:rank": "ts-node bin/task/rank.ts"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",
