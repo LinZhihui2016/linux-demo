@@ -27,7 +27,6 @@ export const postAdd: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
   }
   if (bvList) {
     const [err] = await saveRank([...bvList], rid)
-    await $redis.getList(['bilibili', 'task', 'video'].join(':')).push(bvList || [])
     return err ? error(Err.mysql写入失败, err.sql) : success({ bvList })
   } else {
     return error(Err.b站抓取失败)
