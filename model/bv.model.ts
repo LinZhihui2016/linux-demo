@@ -44,7 +44,7 @@ export const fetchBv = async (bv: string, count = 0): PRes<Bv> => {
     await sleep(1000)
     return count < 5 ? fetchBv(bv, count + 1) : [new Error('解析mid失败'), null]
   }
-  const title = $('h1').text().trim()
+  const title = $('h1 .tit').text().trim()
   const coin = transWan($('.ops .coin').text().trim())
   const collect = transWan($('.ops .collect').text().trim())
   const share = transWan($('.ops .share').text().trim())
