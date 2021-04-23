@@ -4,6 +4,7 @@ import { PRes, Type } from "../../type";
 import { sleep } from "../../util";
 import qs from "qs";
 import { ajaxLog } from "../../util/chalk";
+import { $redis } from "../redis";
 
 export class NodeFetch {
   options: RequestInit;
@@ -17,9 +18,13 @@ export class NodeFetch {
     await sleep(1000)
     const u = this.baseUrl + '/' + url + (method === 'GET' ? '?' + qs.stringify(data) : '')
     ajaxLog('fetch：' + u)
+    const cookie = (await $redis.str.get(['bilibili', 'cookie'].join(':')))[1] || ''
     return new Promise((resolve => {
       fetch(u, {
         ...this.options, ...opt,
+        headers: {
+          cookie
+        },
         method,
         body: method === 'GET' ? JSON.stringify(data) : undefined
       })

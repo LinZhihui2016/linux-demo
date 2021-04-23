@@ -4,6 +4,7 @@ import { sleep } from "../../util";
 import axiosRetry from "axios-retry";
 import { PRes, Type } from "../../type";
 import { ajaxLog } from "../../util/chalk";
+import { $redis } from "../redis";
 
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
@@ -30,7 +31,12 @@ export default class NodeAxios {
   }
 
   interceptors() {
-    this.axiosInstance.interceptors.request.use(req => {
+    this.axiosInstance.interceptors.request.use(async req => {
+      const cookie = (await $redis.str.get(['bilibili', 'cookie'].join(':')))[1] || ''
+      req.headers = {
+        ...req.headers,
+        cookie
+      }
       ajaxLog('axios：' + req.baseURL + '/' + req.url)
       return req
     })

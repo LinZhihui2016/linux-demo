@@ -1,3 +1,5 @@
-import { saveTodayRank } from "../task/rank.task";
+import { updateUp } from "../task/up.task";
+import { updateBv } from "../task/bv.task";
 
-saveTodayRank()
+updateUp()
+updateBv()
