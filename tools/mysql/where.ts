@@ -1,3 +1,5 @@
+import { $mysql } from "./index";
+
 export class Where {
   arr: string[] = []
   isWhere = true
@@ -38,7 +40,7 @@ export class Where {
   }
 
   eq(key: string, value: number | string, not = false) {
-    this.arr.push(not ? `not ` : '' + `${ key } = ${ value }`)
+    this.arr.push(not ? `not ` : '' + `${ key } = ${ $mysql.connection.escape(value) }`)
     return this
   }
 

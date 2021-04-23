@@ -1,7 +1,8 @@
 import { Res, ResArr } from "../helper";
+import { Request } from 'express-serve-static-core'
 
 export namespace Type {
-  export interface obj<T = string> {
+  export interface Obj<T = string | number> {
     [key: string]: T | undefined
   }
 }
@@ -17,4 +18,6 @@ export interface Answer {
   body: ResBody
 }
 
-export type Action<T extends Type.obj<any> = {}> = (query: T) => Promise<Res | ResArr>
+export type Action<T extends Type.Obj<any> = {}> = (query: T & { noCache: boolean }, req?: Request) => Promise<Res | ResArr>
+
+export type PRes<T, E = Error> = Promise<[null, T] | [E, null]>

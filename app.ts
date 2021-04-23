@@ -4,8 +4,8 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import { getParam } from "./middle/getParam";
-import { setupMysql } from "./mysql";
-import { setupRedis } from "./redis";
+import { setupMysql } from "./tools/mysql";
+import { setupRedis } from "./tools/redis";
 import { apiIndex } from "./routes/api";
 import { expressLog } from "./util/chalk";
 

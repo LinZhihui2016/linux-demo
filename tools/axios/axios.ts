@@ -1,9 +1,9 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { apiLog } from "../util/log";
-import { sleep } from "../util";
+import { apiLog } from "../../util/log";
+import { sleep } from "../../util";
 import axiosRetry from "axios-retry";
-import { Type } from "../type";
-import { ajaxLog } from "../util/chalk";
+import { PRes, Type } from "../../type";
+import { ajaxLog } from "../../util/chalk";
 
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
@@ -55,24 +55,26 @@ export default class NodeAxios {
 
   $ = async <T>(
       url: string,
-      data?: Type.obj<string | number | undefined>,
+      data?: Type.Obj<string | number | undefined>,
       opt?: AxiosRequestConfig
-  ) => {
+  ): PRes<T> => {
     const {
       method = "GET",
     } = opt || {};
     await sleep(this.shouldSleep ? 5000 : 1000)
-    return this.axiosInstance
-        .request<T>({
-          ...opt,
-          url,
-          method,
-          params: method === "GET" ? data : {},
-          data: method !== "GET" ? data : {}
-        })
-        .then(
-            res => res.data,
-        )
+    return new Promise((resolve => {
+      this.axiosInstance
+          .request<T>({
+            ...opt,
+            url,
+            method,
+            params: method === "GET" ? data : {},
+            data: method !== "GET" ? data : {}
+          })
+          .then(
+              res => resolve([null, res.data]),
+          ).catch(err => resolve([err, null]))
+    }))
   };
 }
 

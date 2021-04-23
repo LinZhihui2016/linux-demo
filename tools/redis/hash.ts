@@ -26,7 +26,7 @@ export class RedisHash {
     })
   }
 
-  get(key: undefined): RedisPromise<{ [key: string]: string }>
+  get(): RedisPromise<{ [key: string]: string }>
   get(key: string[]): RedisPromise<string[]>
   get(key: string): RedisPromise<string>
   get(key?: string | string[]) {

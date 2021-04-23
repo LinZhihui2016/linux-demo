@@ -16,7 +16,7 @@ export class RedisKey {
         time_s: this.client.expireat,
         time_ms: this.client.pexpireat,
       };
-      hash[type](key, time, redisRes(resolve, is1))
+      hash[type].call(this.client, key, time, redisRes(resolve, is1))
     }))
   }
 

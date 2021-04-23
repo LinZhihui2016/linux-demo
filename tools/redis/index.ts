@@ -3,8 +3,9 @@ import { RedisStr } from "./string";
 import { RedisList } from "./list";
 import { RedisHash } from "./hash";
 import { RedisKey } from "./key";
-import redisConf from '../conf/redis.json'
+import redisConf from '../../conf/redis.json'
 import { RequestHandler } from "express";
+
 declare module 'express-serve-static-core' {
   interface Request {
     redis: Redis
@@ -19,11 +20,13 @@ export class Redis {
   client: redis.RedisClient;
   str: RedisStr;
   key: RedisKey;
+  isConnect = false
 
   constructor(public port: number, public host: string) {
     this.client = redis.createClient(port, host)
     this.client.on('connect', () => {
       console.log(`redis connect ${ host }:${ port } OK`)
+      this.isConnect = true
     })
     this.str = new RedisStr(this)
     this.key = new RedisKey(this)
@@ -42,4 +45,4 @@ export const setupRedis: RequestHandler = (req, res, next) => {
 export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S) => any) =>
     (err: Error | null, reply: S) => resolve([err, fn ? fn(reply) : reply])
 export const isOK = (reply: string) => reply === 'OK'
-export const is1 = (reply: string | number) => reply + '' === '1'
+export const is1 = (reply: string | number) => (reply + '') === '1'

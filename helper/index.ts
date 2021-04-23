@@ -30,9 +30,7 @@ export class Res {
     this.msg = msg
     return this
   }
-
   isArr = false;
-
 }
 
 export class ResArr {
@@ -55,3 +53,6 @@ export class ResArr {
     return new Res(body.map(i => i.data), body.map(i => i.err), body.map(i => i.msg)).json
   }
 }
+
+export const error = (err: Err, msg?: string | string[]) => new Res().error(err, msg)
+export const success = (data: any, msg = '') => new Res().success(data, msg)

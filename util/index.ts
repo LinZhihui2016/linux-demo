@@ -1,4 +1,5 @@
 import { sleepLog } from "./chalk";
+import dayjs from "dayjs";
 
 export const arrayExclude = <T>(target: T[], exclude: T[]): T[] => {
   const res: T[] = [];
@@ -15,3 +16,18 @@ export const sleep = (ms: number) => {
   sleepLog(ms)
   return new Promise<void>(resolve => setTimeout(() => resolve(), ms))
 }
+export const transWan = (str: string) => {
+  const reg = /([0-9]*.?[0-9]*)万$/
+  if (/万/.test(str)) {
+    const s = str.match(reg)
+    const m = s ? (+s[1]) * 10000 : 0
+    return isNaN(m) ? 0 : m
+  } else {
+    return isNaN(+str) ? 0 : +str
+  }
+}
+
+export const MINUTE = 60
+export const HOUR = MINUTE * 60
+export const DAY = HOUR * 24
+export const BEFORE_TOMORROW = () => dayjs().add(1, "day").startOf("date").valueOf()

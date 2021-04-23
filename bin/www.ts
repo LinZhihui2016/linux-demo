@@ -1,6 +1,7 @@
 import app from "../app";
 import debug0 from "debug";
 import http from "http";
+import { logInit } from "../util/log";
 
 const normalizePort = (val: string) => {
   const port = parseInt(val, 10);
@@ -19,7 +20,7 @@ const onListening = () => {
 const debug = debug0('linux-demo:server');
 const port = normalizePort(process.env.PORT || '8808');
 const server = http.createServer(app);
-
+logInit()
 app.set('port', port);
 server.listen(port);
 server.on('listening', onListening);
