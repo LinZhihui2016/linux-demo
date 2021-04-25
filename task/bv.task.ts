@@ -18,7 +18,7 @@ export const updateBv = async () => {
         await $redis.getHash(redisTask('video', 1)).calc(bv)
       }
     }
-    await sleep(1000)
+    await sleep(2000)
     await updateBv()
   }
 }
