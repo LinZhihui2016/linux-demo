@@ -13,9 +13,7 @@ export const fetchRank = async (rid: RankId): PRes<string[]> => {
   if (res && res.data) {
     const { data: { list } } = res
     const bvList = list.map(i => i.bvid)
-    const upList = list.map(i => i.owner.mid + '')
-    await $redis.getList(redisTask('up')).push(upList)
-    await $redis.getList(redisTask('video')).push(bvList)
+    await $redis.getList(redisTask('video', 0)).push(bvList)
     return [null, list.map(i => i.bvid)]
   } else {
     apiLog().error(rid + ' 没有列表')

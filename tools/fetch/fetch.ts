@@ -1,7 +1,6 @@
 import fetch, { RequestInit } from "node-fetch";
 import { cookie } from "../axios/static";
 import { PRes, Type } from "../../type";
-import { sleep } from "../../util";
 import qs from "qs";
 import { ajaxLog } from "../../util/chalk";
 import { $redis } from "../redis";
@@ -15,7 +14,6 @@ export class NodeFetch {
 
   $ = async (url: string, data?: Type.Obj<string | number | undefined>, opt?: RequestInit): PRes<string> => {
     const { method = 'GET' } = opt || {}
-    await sleep(5000)
     const u = this.baseUrl + '/' + url + (method === 'GET' ? '?' + qs.stringify(data) : '')
     ajaxLog('fetch：' + u)
     const cookie = (await $redis.str.get(['bilibili', 'cookie'].join(':')))[1] || ''

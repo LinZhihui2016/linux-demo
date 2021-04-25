@@ -1,18 +1,19 @@
 import { Action } from "../type";
 import { error, success } from "../helper";
 import { Err } from "../util/error";
-import { Bv, fetchBv, saveBv } from "../model/bv.model";
+import { fetchBv, saveBv } from "../model/bv.model";
 import { $redis } from "../tools/redis";
 import { HOUR } from "../util";
+import { VideoSql } from "../tools/mysql/type";
 
 export const postAdd: Action<{ bv: string }> = async ({ bv, noCache }) => {
   if (!bv) return error(Err.参数错误)
-  let bvObj: Bv | null = null
+  let bvObj: VideoSql | null = null
   const redisKey = (['bilibili', 'video', bv].join(':'))
   if ($redis.isConnect && !noCache) {
     const [, info] = await $redis.str.get(redisKey);
     if (info) {
-      bvObj = JSON.parse(info) as Bv
+      bvObj = JSON.parse(info) as VideoSql
     }
   }
   if (!bvObj) {

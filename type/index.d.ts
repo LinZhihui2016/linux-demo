@@ -18,6 +18,6 @@ export interface Answer {
   body: ResBody
 }
 
-export type Action<T extends Type.Obj<any> = {}> = (query: T & { noCache: boolean }, req?: Request) => Promise<Res | ResArr>
+export type Action<T extends Type.Obj<any> = {}> = (query: T & { noCache?: boolean }, req?: Request) => Promise<Res | ResArr>
 
 export type PRes<T, E = Error> = Promise<[null, T] | [E, null]>

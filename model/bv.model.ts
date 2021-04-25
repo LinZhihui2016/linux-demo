@@ -1,72 +1,112 @@
-import { PRes, Type } from "../type";
-import { apiBvHtml } from "../crawler/bv";
-import { sleep, transWan } from "../util";
-import cheerio from "cheerio";
+import { PRes } from "../type";
+import { apiBvHtml, apiPgcInfo } from "../crawler/bv";
+import { sleep } from "../util";
 import { Where } from "../tools/mysql/where";
 import { $mysql } from "../tools/mysql";
 import { Up } from "./up.model";
-import { $date } from "../util/date";
 import { postAdd } from "../api/bv";
+import { BangumiVideoSql, NormalVideoSql, VideoSql } from "../tools/mysql/type";
+import { $redis, redisTask } from "../tools/redis";
 
-export interface Bv extends Type.Obj {
-  bv: string,
-  coin: number
-  collect: number
-  info: string
-  like: number
-  mid: number
-  pic: string
-  share: number
-  title: string
-  view: number
-  dm: number
-  updated?: string
-  uploadTime: string
-  id?: number
-  isFans: number
-  created: string
+export interface NormalVideo {
+  videoData: {
+    bvid: string,
+    aid: number,
+    title: string,
+    pic: string,
+    pubdate: number //发布时间
+    desc: string
+    stat: {
+      view: number,
+      danmaku: number,
+      reply: number,
+      favorite: number,
+      coin: number,
+      share: number,
+      like: number
+    }
+  },
+  upData: {
+    mid: string,
+    name: string
+  }
 }
 
-export const fetchBv = async (bv: string, count = 0): PRes<Bv> => {
+export interface BangumiVideo {
+  h1Title: string,
+  epInfo: {
+    id: number,
+    aid: number,
+    bvid: string,
+    cover: string
+  },
+  mediaInfo: {
+    up_info: {
+      uname: string,
+      mid: number
+    }
+  }
+}
+
+
+export const fetchBv = async (bv: string, count = 0): PRes<VideoSql> => {
   const [e1, text] = await apiBvHtml(bv)
   if (e1) {
     await sleep(3000)
-    return count < 5 ? fetchBv(bv, count + 1) : [e1, null]
+    if (count < 3) {
+      return fetchBv(bv, count + 1)
+    } else {
+      await $redis.getHash(redisTask('video', 1)).calc(bv)
+      return [e1, null]
+    }
   }
-  const $ = cheerio.load(text!)
-  const _mid = $('.u-face a').attr('href')  || $('.up-card a.avatar').attr('href')
-  if (!_mid) {
-    await sleep(3000)
-    return count < 5 ? fetchBv(bv, count + 1) : [new Error('捕获mid失败'), null]
+  const match = text!.match(/window.__INITIAL_STATE__=(.*]});/)
+  if (!match) return [new Error(`b站解析INITIAL_STATE失败,bv:${ bv }`), null]
+  try {
+    const json: NormalVideo | BangumiVideo = JSON.parse(match[1])
+    if ("videoData" in json) {
+      //普通视频
+      const {
+        videoData: {
+          stat,
+          ...other
+        }, upData: {
+          name, mid
+        }
+      } = json
+      const normalBv: NormalVideoSql = { up_mid: +mid, up_name: name, ...other, ...stat, type: 'normal', isFans: 0 }
+      return [null, normalBv]
+    } else if ('mediaInfo' in json) {
+      const { h1Title: title, epInfo: { id, aid, bvid, cover: pic }, mediaInfo: { up_info } } = json
+      const [err, info] = await apiPgcInfo(aid + '')
+      if (err) return [err, null]
+      const { data: { stat } } = info!
+      const { coin, dm: danmaku, like, reply, view } = stat
+      const bangumiBv: BangumiVideoSql = {
+        aid, bvid, epId: id,
+        title,
+        isFans: 0,
+        type: 'bangumi',
+        coin,
+        danmaku,
+        like,
+        reply,
+        view,
+        pic,
+        up_name: up_info.uname,
+        up_mid: up_info.mid
+      }
+      return [null, bangumiBv]
+    } else {
+      return [new Error(`b站解析INITIAL_STATE失败,bv:${ bv }`), null]
+    }
+  } catch (e) {
+    return [new Error(`b站解析INITIAL_STATE失败,bv:${ bv }`), null]
   }
-  const midMatch = _mid.match(/\/([0-9]*)$/)
-  if (!midMatch) {
-    await sleep(1000)
-    return count < 5 ? fetchBv(bv, count + 1) : [new Error('解析mid失败'), null]
-  }
-  const title = $('h1 .tit').text().trim()
-  const coin = transWan($('.ops .coin').text().trim())
-  const collect = transWan($('.ops .collect').text().trim())
-  const share = transWan($('.ops .share').text().trim())
-  const info = $('#v_desc .info').text().trim()
-  const pic = $('head meta[property="og:image"]').attr('content')
-  const num = (reg: RegExp, text?: string, init = 0) => {
-    const viewMatch = (text || '').match(reg)
-    return viewMatch ? +viewMatch[1] : init
-  }
-  const view = num(/([0-9]*)$/, $('.video-data .view').attr('title'))
-  const dm = num(/([0-9]*)$/, $('.video-data .dm').attr('title'))
-  const like = num(/([0-9]*)$/, $('.ops .like').attr('title'))
-  const uploadTime = $('head meta[itemprop="uploadDate"]').attr('content') || ''
-
-  return [null, {
-    bv, title, mid: +midMatch[1], like, coin, collect, share, info, pic: pic ? pic.replace(/https?/, 'https') : '',
-    view, dm, uploadTime, isFans: 0, created: $date(new Date(), 4)
-  }]
 }
 
-export const saveBv = async (bv: Bv) => {
-  const where = new Where().eq('bv', bv.bv)
+export const saveBv = async (bv: VideoSql) => {
+  const where = new Where().eq('bv', bv.bvid)
   const [err, data] = await $mysql.query<Up>('video').select('bv').where(where).find()
   if (err) return [err, null]
   return $mysql.$('video', bv, data.length > 0 ? where : undefined)
