@@ -30,4 +30,9 @@ export interface BangumiVideoSql extends VideoSqlBase {
   epId: number //bangumi
 }
 
-export type VideoSql = NormalVideoSql | BangumiVideoSql
+export interface DeletedVideoSql extends Type.Obj {
+  type: 'deleted',
+  bvid: string,
+}
+
+export type VideoSql = NormalVideoSql | BangumiVideoSql | DeletedVideoSql

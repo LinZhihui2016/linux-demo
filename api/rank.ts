@@ -47,16 +47,16 @@ export const getPaging: Action<{ rid: RankId, date: string }> = async ({ rid, da
   if (err) {
     return error(Err.mysql读取失败, err.message)
   }
-  if (list.length !== 1){
+  if (list.length !== 1) {
     return error(Err.mysql读取失败, '日期或rid错误')
   }
   const bvs = list[0].LIST.split(',')
-  const w = new Where().in('bv', bvs)
-  const [err2, bvList] = await $mysql.query<{ BV: string, TITLE: string, MID: number, PIC: string }>('video').select(['bv', 'title', 'mid', 'pic']).where(w).find()
+  const w = new Where().in('bvid', bvs)
+  const [err2, bvList] = await $mysql.query<{ bvid: string }>('video').where(w).find()
   if (err2) {
     return error(Err.mysql读取失败, err2.sql)
   } else {
-    return success(bvs.map(bv => bvList.find(i => i.BV === bv) || bv))
+    return success(bvs.map(bv => bvList.find(i => i.bvid === bv) || bv))
   }
 }
 
