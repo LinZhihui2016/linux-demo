@@ -3,7 +3,6 @@ import { apiBvHtml, apiPgcInfo } from "../crawler/bv";
 import { sleep } from "../util";
 import { Where } from "../tools/mysql/where";
 import { $mysql } from "../tools/mysql";
-import { Up } from "./up.model";
 import { postAdd } from "../api/bv";
 import { BangumiVideoSql, NormalVideoSql, VideoSql } from "../tools/mysql/type";
 import { $redis, redisTask } from "../tools/redis";
@@ -106,8 +105,8 @@ export const fetchBv = async (bv: string, count = 0): PRes<VideoSql> => {
 }
 
 export const saveBv = async (bv: VideoSql) => {
-  const where = new Where().eq('bv', bv.bvid)
-  const [err, data] = await $mysql.query<Up>('video').select('bv').where(where).find()
+  const where = new Where().eq('bvid', bv.bvid)
+  const [err, data] = await $mysql.query<VideoSql>('video').select('bvid').where(where).find()
   if (err) return [err, null]
   return $mysql.$('video', bv, data.length > 0 ? where : undefined)
 }
