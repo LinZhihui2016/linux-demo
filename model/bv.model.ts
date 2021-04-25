@@ -67,13 +67,15 @@ export const fetchBv = async (bv: string, count = 0): PRes<VideoSql> => {
       //普通视频
       const {
         videoData: {
-          stat,
-          ...other
-        }, upData: {
-          name, mid
-        }
+          stat: { view, danmaku, reply, favorite, coin, share, like, },
+          bvid, aid, title, pic, pubdate, desc,
+        }, upData: { name, mid }
       } = json
-      const normalBv: NormalVideoSql = { up_mid: +mid, up_name: name, ...other, ...stat, type: 'normal', isFans: 0 }
+      const normalBv: NormalVideoSql = {
+        up_mid: +mid, up_name: name, bvid,
+        aid, title, pic, pubdate, desc, view, danmaku,
+        reply, favorite, coin, share, like, type: 'normal', isFans: 0
+      }
       return [null, normalBv]
     } else if ('mediaInfo' in json) {
       const { h1Title: title, epInfo: { id, aid, bvid, cover: pic }, mediaInfo: { up_info } } = json
