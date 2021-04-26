@@ -8,7 +8,7 @@ export const updateBv = async () => {
   if (bv) {
     await $redis.getHash(redisTask('video', 1)).calc(bv)
     const [, time] = await $redis.getHash(redisTask('video', 1)).get(bv)
-    if (!(time && +time <= 5)) {
+    if ((time && +time <= 5)) {
       const res = await bvAction.postAdd({ bv })
       const { err } = res.json.body
       if (err) {
