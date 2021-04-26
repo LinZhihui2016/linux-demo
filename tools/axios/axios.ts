@@ -35,7 +35,7 @@ export default class NodeAxios {
         ...req.headers,
         cookie
       }
-      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + req.params)
+      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + JSON.stringify(req.params))
       return req
     })
     this.axiosInstance.interceptors.response.use(res => {
