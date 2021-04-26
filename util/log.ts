@@ -6,4 +6,7 @@ export const logInit = () =>
       categories: { default: { appenders: ['api'], level: 'error' } }
     })
 
-export const apiLog = () => log4js.getLogger('api')
+export const apiLog = () => {
+  logInit()
+  return log4js.getLogger('api')
+}

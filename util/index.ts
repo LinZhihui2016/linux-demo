@@ -40,6 +40,12 @@ export function lowerCaseKeys(key: string, value: any) {
   }
   return value;
 }
+
+export const toInt = (s?: string, init = 0) => {
+  if (!s) return init;
+  if (isNaN(parseInt(s))) return init
+  return parseInt(s)
+}
 export const MINUTE = 60
 export const HOUR = MINUTE * 60
 export const DAY = HOUR * 24

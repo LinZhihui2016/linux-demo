@@ -6,9 +6,10 @@
     "start": "ts-node bin/www.ts",
     "dev": "ts-node bin/script.ts",
     "task:bv": "ts-node bin/task/bv.ts",
+    "task:bvLog": "ts-node bin/task/bvLog.ts",
     "task:up": "ts-node bin/task/up.ts",
     "task:rank": "ts-node bin/task/rank.ts",
-    "task:temp": "ts-node bin/task/temp.ts"
+    "temp": "ts-node bin/task/temp.ts"
   },
   "dependencies": {
     "@types/cookie-parser": "^1.4.2",

@@ -1,4 +1,5 @@
 import { Type } from "../../type";
+import { RankId } from "../../crawler/ranking";
 
 export interface VideoSqlBase extends Type.Obj {
   bvid: string,
@@ -14,7 +15,7 @@ export interface VideoSqlBase extends Type.Obj {
   up_name: string
   updated?: string
   created?: string
-  isFans: number
+  isFans?: number
 }
 
 export interface NormalVideoSql extends VideoSqlBase {
@@ -36,3 +37,50 @@ export interface DeletedVideoSql extends Type.Obj {
 }
 
 export type VideoSql = NormalVideoSql | BangumiVideoSql | DeletedVideoSql
+
+export interface RankSql extends Type.Obj {
+  updated?: string
+  created?: string
+  id?: number
+  rid: RankId
+  date: string
+  list: string
+}
+
+export interface UpSql extends Type.Obj {
+  name: string,
+  sign: string,
+  face: string,
+  mid: number,
+  follower: number,
+  archive: number,
+  likes: number,
+  isFans?: 0 | 1,
+  id?: number
+  updated?: string
+  created?: string
+}
+
+export interface VideoLogSql extends Type.Obj {
+  updated?: string
+  created?: string
+  id?: number
+  view: number,
+  danmaku: number
+  reply: number,
+  coin: number,
+  like: number
+  video_id: number
+  date: number
+}
+
+export interface UpLogSql extends Type.Obj {
+  updated?: string
+  created?: string
+  id?: number
+  up_id: number
+  date: number
+  follower: number,
+  archive: number,
+  likes: number,
+}

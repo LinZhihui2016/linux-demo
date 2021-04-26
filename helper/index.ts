@@ -1,5 +1,5 @@
 import { isArr } from "../util";
-import { Err } from "../util/error";
+import { Err, ErrBase } from "../util/error";
 import { Answer } from "../type";
 import { apiLog } from "../util/log";
 import { errorLog } from "../util/chalk";
@@ -18,7 +18,7 @@ export class Res {
 
   error(err: Err, msg?: string | string[]) {
     this.err = err
-    this.msg = [Err[err], ...isArr(msg || '')].filter(Boolean)
+    this.msg = [ErrBase[err], ...isArr(msg || '')].filter(Boolean)
     errorLog(msg)
     apiLog().error(msg)
     return this

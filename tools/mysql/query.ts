@@ -50,6 +50,11 @@ export class Query<T> {
     return this
   }
 
+  count(key = 'len') {
+    this._select = `count(*) as ${ key }`
+    return this
+  }
+
   select(k: string | string[]) {
     const _select = ((Array.isArray(k) ? k : [k]).join(',')).toUpperCase()
     this._select = _select || '*'
@@ -60,6 +65,7 @@ export class Query<T> {
     if (pageSize > 1 && page >= 0) {
       this._limit = `${ page * pageSize },${ (page + 1) * pageSize }`
     }
+    return this
   }
 
   where(w: Where | string) {

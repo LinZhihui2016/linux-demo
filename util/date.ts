@@ -16,7 +16,7 @@ enum DateFormatType {
   f13 = ""
 }
 
-export const $date = (date: Date | string | number, type = 0): string => {
+export const $date = (date: Date | string | number = new Date(), type = 0): string => {
   const t = typeof date === "number" ? new Date(date) : date;
   if (!t) {
     return "";
@@ -25,9 +25,9 @@ export const $date = (date: Date | string | number, type = 0): string => {
   if (type === 13) {
     _type = 0;
   }
-  const key = `f${_type}`;
+  const key = `f${ _type }`;
   let format = dayjs(t).format(
-    DateFormatType[key as keyof typeof DateFormatType]
+      DateFormatType[key as keyof typeof DateFormatType]
   );
   if (type === 13) {
     format += " " + $weekday(t);
@@ -35,4 +35,4 @@ export const $date = (date: Date | string | number, type = 0): string => {
   return format;
 };
 export const $weekday = (date: Date | string | number) =>
-  "周" + "日一二三四五六"[dayjs(date).day()];
+    "周" + "日一二三四五六"[dayjs(date).day()];

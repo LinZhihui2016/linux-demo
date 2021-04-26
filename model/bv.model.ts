@@ -87,7 +87,7 @@ export const fetchBv = async (bv: string, count = 0): PRes<VideoSql> => {
     const normalBv: NormalVideoSql = {
       up_mid: +mid, up_name: name, bvid,
       aid, title, pic, pubdate, desc, view, danmaku,
-      reply, favorite, coin, share, like, type: 'normal', isFans: 0
+      reply, favorite, coin, share, like, type: 'normal'
     }
     return [null, normalBv]
   } else if ('mediaInfo' in json) {
@@ -99,7 +99,6 @@ export const fetchBv = async (bv: string, count = 0): PRes<VideoSql> => {
     const bangumiBv: BangumiVideoSql = {
       aid, bvid, epId: id,
       title,
-      isFans: 0,
       type: 'bangumi',
       coin,
       danmaku,
@@ -127,4 +126,8 @@ export const addBvList = async (list: string[]) => {
   for (const bv of list) {
     await postAdd({ bv, noCache: false })
   }
+}
+
+export const fansList = <T = VideoSql>(where: Where = new Where()) => {
+  return $mysql.query<T>('video').where(where.eq('isFans', 1))
 }
