@@ -1,4 +1,4 @@
-import { Action } from "../type";
+import { Action, Type } from "../type";
 import { RankId } from "../crawler/ranking";
 import { error, success } from "../helper";
 import { Err } from "../util/error";
@@ -37,8 +37,11 @@ export const postAdd: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
 }
 
 export const getRid: Action = () => {
-  const rankIdList = Object.keys(RankId).filter(i => /^[0-9]*$/.test(i))
-  return Promise.resolve(success(rankIdList))
+  const rankObj: Type.Obj = {}
+  Object.keys(RankId).filter(i => /^[0-9]*$/.test(i)).forEach(i => {
+    rankObj[i] = RankId[+i]
+  })
+  return Promise.resolve(success(rankObj))
 }
 
 export const getPaging: Action<{ rid: RankId, date: string }> = async ({ rid, date }) => {

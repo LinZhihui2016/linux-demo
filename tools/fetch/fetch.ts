@@ -1,5 +1,4 @@
 import fetch, { RequestInit } from "node-fetch";
-import { cookie } from "../axios/static";
 import { PRes, Type } from "../../type";
 import qs from "qs";
 import { ajaxLog } from "../../util/chalk";
@@ -9,7 +8,7 @@ export class NodeFetch {
   options: RequestInit;
 
   constructor(public baseUrl: string, options: RequestInit) {
-    this.options = { headers: { cookie }, ...options }
+    this.options = { headers: {}, ...options }
   }
 
   $ = async (url: string, data?: Type.Obj<string | number | undefined>, opt?: RequestInit): PRes<string> => {

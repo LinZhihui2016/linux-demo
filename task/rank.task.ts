@@ -5,6 +5,7 @@ import { PRes } from "../type";
 import { Where } from "../tools/mysql/where";
 import { $date } from "../util/date";
 import { $mysql } from "../tools/mysql";
+import { $redis, redisTask } from "../tools/redis";
 
 export const saveTodayRank = async () => {
   const rankIdList = Object.keys(RankId).filter(i => /^[0-9]*$/.test(i))
@@ -26,6 +27,17 @@ export const saveTodayRank = async () => {
     const [, data] = await $mysql.query('video_rank').where(where).find()
     if (data.length === 0) {
       await work(rid as unknown as RankId)
+    }
+  }
+}
+
+export const pushTodayBv = async () => {
+  const date = $date(new Date())
+  const [, info] = await $mysql.query<{ LIST: string }>('video_rank').select('list').where(new Where().eq('date', date)).find()
+  console.log(info)
+  if (info) {
+    for (const i of info) {
+      await $redis.getList(redisTask('video')).push(i.LIST.split(','))
     }
   }
 }
