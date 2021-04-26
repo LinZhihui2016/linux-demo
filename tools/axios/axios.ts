@@ -5,6 +5,7 @@ import axiosRetry from "axios-retry";
 import { PRes, Type } from "../../type";
 import { ajaxLog } from "../../util/chalk";
 import { $redis } from "../redis";
+import qs from "qs";
 
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
@@ -35,7 +36,7 @@ export default class NodeAxios {
         ...req.headers,
         cookie
       }
-      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + JSON.stringify(req.params))
+      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + qs.stringify(req.params))
       return req
     })
     this.axiosInstance.interceptors.response.use(res => {
