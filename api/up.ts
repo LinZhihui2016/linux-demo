@@ -10,7 +10,7 @@ import { UP_FANS_MAX } from "../util/magic";
 import { paging } from "../tools/mysql/helper";
 import { UpSql } from "../tools/mysql/type";
 
-export const postAdd: Action<{ mid: number }> = async ({ mid, noCache }) => {
+export const postAdd: Action<{ mid: number|string }> = async ({ mid, noCache }) => {
   if (!mid) return error(ErrBase.参数错误)
   let up: UpSql | null = null
   const redisKey = (['bilibili', 'up', mid].join(':'))
