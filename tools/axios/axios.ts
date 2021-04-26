@@ -9,7 +9,6 @@ import { $redis } from "../redis";
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
   private readonly options: AxiosRequestConfig;
-  shouldSleep = false
 
   constructor(
       options: AxiosRequestConfig,
@@ -22,7 +21,6 @@ export default class NodeAxios {
           shouldResetTimeout: true,
           retryDelay: () => 5000,
           retryCondition: (error) => {
-            this.shouldSleep = true
             apiLog().error(error.config.url + ' retry')
             return true
           }
@@ -37,11 +35,10 @@ export default class NodeAxios {
         ...req.headers,
         cookie
       }
-      ajaxLog('axios：' + req.baseURL + '/' + req.url)
+      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + req.params)
       return req
     })
     this.axiosInstance.interceptors.response.use(res => {
-      this.shouldSleep = false
       return res
     }, err => {
       if (err.isAxiosError) {
@@ -67,7 +64,7 @@ export default class NodeAxios {
     const {
       method = "GET",
     } = opt || {};
-    await sleep(this.shouldSleep ? 5000 : 1000)
+    await sleep(1000)
     return new Promise((resolve => {
       this.axiosInstance
           .request<T>({

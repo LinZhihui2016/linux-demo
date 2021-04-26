@@ -34,7 +34,6 @@ export const saveTodayRank = async () => {
 export const pushTodayBv = async () => {
   const date = $date(new Date())
   const [, info] = await $mysql.query<{ LIST: string }>('video_rank').select('list').where(new Where().eq('date', date)).find()
-  console.log(info)
   if (info) {
     for (const i of info) {
       await $redis.getList(redisTask('video')).push(i.LIST.split(','))

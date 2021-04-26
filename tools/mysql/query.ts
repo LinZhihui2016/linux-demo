@@ -47,6 +47,7 @@ export class Query<T> {
 
   distinct(flag?: boolean) {
     this._distinct = !!flag
+    return this
   }
 
   select(k: string | string[]) {
