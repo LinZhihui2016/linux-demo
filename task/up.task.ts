@@ -26,7 +26,7 @@ export const updateUp = async () => {
             await $redis.getHash(redisTask('up', 1)).calc(mid)
           }
         }
-        await sleep(3000)
+        await sleep(5000)
       }
     } else {
       infoLog(mid + '已存在数据库')
