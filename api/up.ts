@@ -10,7 +10,7 @@ import { UP_FANS_MAX } from "../util/magic";
 import { paging } from "../tools/mysql/helper";
 import { UpSql } from "../tools/mysql/type";
 
-export const postAdd: Action<{ mid: string }> = async ({ mid, noCache }) => {
+export const postAdd: Action<{ mid: number }> = async ({ mid, noCache }) => {
   if (!mid) return error(ErrBase.参数错误)
   let up: UpSql | null = null
   const redisKey = (['bilibili', 'up', mid].join(':'))
@@ -48,7 +48,7 @@ export const getInfo: Action<{ mid: string }> = async ({ mid }) => {
   }
 }
 
-export const postFans: Action<{ mid: string, status: boolean }> = async ({ mid, status }) => {
+export const postFans: Action<{ mid: number, status: boolean }> = async ({ mid, status }) => {
   if (!mid) return error(ErrBase.参数错误)
   if (status) {
     const fansCountWhere = new Where().eq('isFans', 1)

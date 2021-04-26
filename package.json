@@ -7,6 +7,7 @@
     "dev": "ts-node bin/script.ts",
     "task:bv": "ts-node bin/task/bv.ts",
     "task:bvLog": "ts-node bin/task/bvLog.ts",
+    "task:upLog": "ts-node bin/task/upLog.ts",
     "task:up": "ts-node bin/task/up.ts",
     "task:rank": "ts-node bin/task/rank.ts",
     "temp": "ts-node bin/task/temp.ts"

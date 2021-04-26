@@ -26,6 +26,6 @@ export const saveUp = async (up: UpSql) => {
   return $mysql.$('up', up, data.length > 0 ? where : undefined)
 }
 
-export const fansList = (where: Where = new Where()) => {
-  return $mysql.query<UpSql>('up').where(where.eq('isFans', 1))
+export const fansList = <T = UpSql>(where: Where = new Where()) => {
+  return $mysql.query<T>('up').where(where.eq('isFans', 1))
 }
