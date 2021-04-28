@@ -1,3 +1,3 @@
-import { saveTodayRank } from "../../task/rank.task";
+import { rankDailyTask } from "../../modules/rank/task";
 
-saveTodayRank().then(() => process.exit(1))
+rankDailyTask().then(() => process.exit(1))

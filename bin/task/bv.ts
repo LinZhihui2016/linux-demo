@@ -1,3 +1,3 @@
-import { updateBv } from "../../task/bv.task";
+import { videoTask } from "../../modules/video/task";
 
-updateBv().then(() => process.exit(1))
+videoTask().then(() => process.exit(1))

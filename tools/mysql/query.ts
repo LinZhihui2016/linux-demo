@@ -73,8 +73,12 @@ export class Query<T> {
     return this
   }
 
-  orderBy(key: string, by: 'ASC' | "DESC" = 'ASC') {
-    this._orderBy.push([key, by].join(' '))
+  orderBy(key: string, by: 'ASC' | "DESC" | any[] = 'ASC') {
+    if (Array.isArray(by)) {
+      this._orderBy.push(`FIELD(${ key },${ by.join(',') })`)
+    } else {
+      this._orderBy.push([key, by].join(' '))
+    }
     return this
   }
 

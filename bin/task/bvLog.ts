@@ -1,3 +1,3 @@
-import { bvLog } from "../../task/bvLog.task";
+import { videoLogTask } from "../../modules/video_log/task";
 
-bvLog().then(() => process.exit(1))
+videoLogTask().then(() => process.exit(1))

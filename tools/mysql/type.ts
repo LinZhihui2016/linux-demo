@@ -3,6 +3,9 @@ import { RankId } from "../../crawler/ranking";
 
 export interface VideoSqlBase extends Type.Obj {
   bvid: string,
+}
+
+export interface VideoSqlBase_ extends VideoSqlBase {
   aid: number,
   title: string,
   pic: string,
@@ -18,7 +21,7 @@ export interface VideoSqlBase extends Type.Obj {
   isFans?: number
 }
 
-export interface NormalVideoSql extends VideoSqlBase {
+export interface NormalVideoSql extends VideoSqlBase_ {
   type: 'normal',
   favorite: number,
   share: number,
@@ -26,14 +29,13 @@ export interface NormalVideoSql extends VideoSqlBase {
   desc: string
 }
 
-export interface BangumiVideoSql extends VideoSqlBase {
+export interface BangumiVideoSql extends VideoSqlBase_ {
   type: 'bangumi',
   epId: number //bangumi
 }
 
-export interface DeletedVideoSql extends Type.Obj {
+export interface DeletedVideoSql extends VideoSqlBase {
   type: 'deleted',
-  bvid: string,
 }
 
 export type VideoSql = NormalVideoSql | BangumiVideoSql | DeletedVideoSql

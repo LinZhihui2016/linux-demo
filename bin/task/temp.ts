@@ -1,8 +1,7 @@
-import { $mysql } from "../../tools/mysql";
-import { $redis, redisTask } from "../../tools/redis";
+import { fansVideoList } from "../../modules/video_fans/mysql";
 
 const temp = async () => {
-  const [, mid] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct().find()
-  await $redis.getList(redisTask('up')).push(mid.map(i => i.UP_MID + ''))
+  const a = await fansVideoList(1, {})
+  console.log(a)
 }
 temp().then(() => process.exit(1))

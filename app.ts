@@ -37,7 +37,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
-  req.body = Object.assign({}, req.query, req.body)
+  req.body = Object.assign({}, req.query, req.body, { user: 1 })
   expressLog(req.url)
   next()
 })

@@ -1,13 +1,23 @@
 export enum ErrUp {
   未收录该up主 = 41001,
+  已收录该up主 = 41002,
   关注数量达到上限 = 42001,
-  关注列表为空 = 42002
+  关注列表为空 = 42002,
+  关注失败 = 42003,
+  取消关注失败 = 42004
 }
 
 export enum ErrVideo {
   未收录该视频 = 51001,
+  已收录该视频 = 51002,
   关注数量达到上限 = 52001,
-  关注列表为空 = 52002
+  关注列表为空 = 52002,
+  关注失败 = 52003,
+  取消关注失败 = 52004
+}
+
+export enum ErrRank {
+  获取排行榜失败 = 61001
 }
 
 export enum ErrBase {
@@ -19,6 +29,6 @@ export enum ErrBase {
   参数错误 = 1,
 }
 
-export type Err = ErrBase | ErrUp | ErrVideo
+export type Err = ErrBase | ErrUp | ErrVideo | ErrRank
 
 
