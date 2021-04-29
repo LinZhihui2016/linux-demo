@@ -41,7 +41,7 @@ export const handleTaskLv2 = async (): PRes<number> => {
   if (!len) return [null, len]
   const [e, info] = await videoTaskLv1().get()
   if (e) return [e, null]
-  for (const bv of Object.keys(info)) {
+  for (const bv of Object.keys(info || {})) {
     const count = +info[bv]
     if (count < 3) {
       await videoTaskLv0().push(bv)

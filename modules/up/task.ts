@@ -1,7 +1,7 @@
 import { handleTaskLv2, upTaskLv0, upTaskLv1 } from "./redis";
 import { sleep } from "../../util";
-import { getListByUpdated, getUp } from "./mysql";
-import { postCreated } from "./api";
+import { getListByUpdated } from "./mysql";
+import { createdAndUpdated } from "./helper";
 
 let errorTime = 0
 export const upTask = async (): Promise<void> => {
@@ -13,18 +13,15 @@ export const upTask = async (): Promise<void> => {
       //1级仓库还是空的,开始轮回
       const [, up] = await getListByUpdated(10, 'ASC')
       await upTaskLv0().push((up || []).map(i => i.mid + ''))
+      await sleep(1000 * 60)
       return await upTask()
     }
     if (len) return await upTask()
   }
-  const [e] = await getUp(+mid)
-  //mysql里存在，不准备添加
-  if (!e) return await upTask()
   await upTaskLv1().calc(mid)
   const [, time] = await upTaskLv1().get(mid)
   if ((time && +time <= 5)) {
-    const res = await postCreated({ mid: +mid })
-    const { err } = res.json.body
+    const [err] = await createdAndUpdated(+mid)
     if (err) {
       errorTime++
       if (errorTime >= 20) {

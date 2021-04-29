@@ -1,6 +1,5 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { apiLog } from "../../util/log";
-import { sleep } from "../../util";
 import axiosRetry from "axios-retry";
 import { PRes, Type } from "../../type";
 import { ajaxLog } from "../../util/chalk";
@@ -65,7 +64,6 @@ export default class NodeAxios {
     const {
       method = "GET",
     } = opt || {};
-    await sleep(1000)
     return new Promise((resolve => {
       this.axiosInstance
           .request<T>({

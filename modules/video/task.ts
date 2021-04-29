@@ -1,7 +1,7 @@
 import { handleTaskLv2, videoTaskLv0, videoTaskLv1 } from "./redis";
-import { getListByUpdated, getVideo } from "./mysql";
-import { postCreated } from "./api";
+import { getListByUpdated } from "./mysql";
 import { sleep } from "../../util";
+import { createdAndUpdated } from "./helper";
 
 let errorTime = 0
 export const videoTask = async (): Promise<void> => {
@@ -13,18 +13,15 @@ export const videoTask = async (): Promise<void> => {
       //1级仓库还是空的,开始轮回
       const [, video] = await getListByUpdated(10, 'ASC')
       await videoTaskLv0().push((video || []).map(i => i.bvid))
+      await sleep(1000 * 60)
       return await videoTask()
     }
     if (len) return await videoTask()
   }
-  const [e] = await getVideo(bvid)
-  //mysql里存在，不准备添加
-  if (!e) return await videoTask()
   await videoTaskLv1().calc(bvid)
   const [, time] = await videoTaskLv1().get(bvid)
   if ((time && +time <= 5)) {
-    const res = await postCreated({ bv: bvid })
-    const { err } = res.json.body
+    const [err] = await createdAndUpdated(bvid)
     if (err) {
       errorTime++
       if (errorTime >= 20) {
