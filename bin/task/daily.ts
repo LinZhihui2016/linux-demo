@@ -4,9 +4,7 @@ import { checkUp } from "../../modules/up/helper";
 import { upLogTask } from "../../modules/up_log/task";
 import { videoLogTask } from "../../modules/video_log/task";
 import { infoLog } from "../../util/chalk";
-import { EventEmitter } from "events";
 
-EventEmitter.defaultMaxListeners = 0
 const daily = async () => {
   infoLog('rankDailyTask')
   await rankDailyTask()

@@ -2,23 +2,12 @@ import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrUp } from "../../util/error";
 import { getListByUpdated, getUp } from "./mysql";
-import { createdAndUpdated } from "./helper";
 import { fansUp, fansUpList, unfansUp } from "../up_fans/mysql";
+import { upTaskLv0 } from "./redis";
 
-export const postCreated: Action<{ mid: number }> = async ({ mid, noCache }) => {
-  if (!mid) return error(ErrBase.参数错误)
-  const checkSql = await getUp(mid)
-  if (checkSql[1]) return error(ErrUp.已收录该up主, checkSql[1].name)
-  const [err, res] = await createdAndUpdated(mid, noCache)
-  if (err) return err!
-  return success(res)
-}
-
-export const postUpdated: Action<{ mid: number }> = async ({ mid, noCache }) => {
-  if (!mid) return error(ErrBase.参数错误)
-  const [err, res] = await createdAndUpdated(mid, noCache)
-  if (err) return err!
-  return success(res)
+export const postAdd: Action<{ mid: number }> = async ({ mid }) => {
+  const [err] = await upTaskLv0().unshift(mid + '')
+  return err ? error(ErrBase.redis写入失败) : success('加入任务列表成功')
 }
 
 export const getInfo: Action<{ mid: number }> = async ({ mid }) => {

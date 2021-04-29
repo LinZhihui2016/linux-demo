@@ -7,6 +7,7 @@ import redisConf from '../../conf/redis.json'
 import { RequestHandler } from "express";
 import { apiLog } from "../../util/log";
 import { infoLog } from "../../util/chalk";
+import { EventEmitter } from "events";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -27,6 +28,7 @@ export class Redis {
   constructor(public port: number, public host: string) {
     this.client = redis.createClient(port, host)
     this.client.on('connect', () => {
+      EventEmitter.defaultMaxListeners = 0
       this.isConnect = true
       infoLog(`redis connect ${ host }:${ port } OK`)
     })

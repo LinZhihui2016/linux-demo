@@ -2,23 +2,12 @@ import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrVideo } from "../../util/error";
 import { getListByUpdated, getVideo } from "./mysql";
-import { createdAndUpdated } from "./helper";
 import { fansVideo, fansVideoList, unfansVideo } from "../video_fans/mysql";
+import { videoTaskLv0 } from "./redis";
 
-export const postCreated: Action<{ bv: string }> = async ({ bv, noCache }) => {
-  if (!bv) return error(ErrBase.参数错误)
-  const checkSql = await getVideo(bv)
-  if (checkSql[1]) return error(ErrVideo.已收录该视频, bv)
-  const [err, res] = await createdAndUpdated(bv, noCache)
-  if (err) return err!
-  return success(res)
-}
-
-export const postUpdated: Action<{ bv: string }> = async ({ bv, noCache }) => {
-  if (!bv) return error(ErrBase.参数错误)
-  const [err, res] = await createdAndUpdated(bv, noCache)
-  if (err) return err!
-  return success(res)
+export const postAdd: Action<{ bv: string }> = async ({ bv }) => {
+  const [err] = await videoTaskLv0().unshift(bv)
+  return err ? error(ErrBase.redis写入失败) : success('加入任务列表成功')
 }
 
 export const getInfo: Action<{ bv: string }> = async ({ bv }) => {

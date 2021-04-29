@@ -7,6 +7,7 @@ import { Type } from "../../type";
 import { $date } from "../../util/date";
 import { apiLog } from "../../util/log";
 import { infoLog } from "../../util/chalk";
+import { EventEmitter } from "events";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -24,7 +25,9 @@ export class Mysql {
       host, user, password, database,
       charset: 'utf8mb4'
     })
+
     this.connection.connect((err) => {
+      EventEmitter.defaultMaxListeners = 0
       if (err) {
         console.error('error connecting: ' + err.stack);
         return;

@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { apiLog } from "../../util/log";
 import { VideoLogSql, VideoSqlBase_ } from "../../tools/mysql/type";
 import { saveVideoLog } from "./mysql";
-import { postUpdated } from "../video/api";
+import { createdAndUpdated } from "../video/helper";
 
 export const videoLogTask = async () => {
   const [, allList] = await getAllVideoInFans();
@@ -14,8 +14,7 @@ export const videoLogTask = async () => {
     if (err) return apiLog().error(err.message)
     for (const item of list!) {
       const { ID, BVID } = item
-      const res = await postUpdated({ bv: BVID, noCache: true })
-      const { data } = res.json.body
+      const [, data] = await createdAndUpdated(BVID, true)
       if (data) {
         const { view, danmaku, reply, like, coin } = data as VideoSqlBase_
         const log: VideoLogSql = { view, danmaku, reply, like, coin, video_id: ID, date }
