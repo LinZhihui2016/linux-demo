@@ -22,8 +22,8 @@ export const setVideoCache = async (video: VideoSql) => {
   await $redis.str.set({ [redisKey]: JSON.stringify(video) })
   await $redis.key.expire(redisKey, HOUR)
 }
-export const videoSet = (type: 'sql' | 'storage' | 'fail' ) => ['set', 'up', type].join(':')
-export const videoSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' | 'fail' = 'storage') => await $redis.getSet(videoSet(type)).add(mid)
+export const videoSet = (type: 'sql' | 'storage' | 'fail' | 'wait') => ['set', 'up', type].join(':')
+export const videoSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' | 'fail' | 'wait' = 'storage') => await $redis.getSet(videoSet(type)).add(mid)
 
 export const videoTaskKey = (type: 'update' | 'create', lv: number) => redisTask('video', type, lv)
 export const videoUpdateKey = (lv: number) => videoTaskKey('update', lv)

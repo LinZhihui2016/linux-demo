@@ -44,16 +44,23 @@ export const upUpdateTask = async () => {
 }
 
 export const upCreateTask = async () => {
+  const wait = $redis.getSet(videoSet('wait'))
   const storage = $redis.getSet(videoSet('storage'))
   const fail = $redis.getSet(videoSet('fail'))
   const [, list] = await storage.diff(videoSet('sql'))
   infoLog(list.length + '个up主')
-  for (const mid of list) {
-    const [err2] = await createdAndUpdated(+mid)
-    if (err2) {
-      await fail.add(mid)
+  await wait.add(list)
+  while (1) {
+    const [, mid] = await wait.pop()
+    if (mid) {
+      const [err2] = await createdAndUpdated(+mid)
+      if (err2) {
+        await fail.add(mid)
+      } else {
+        await fail.del(mid)
+      }
     } else {
-      await fail.del(mid)
+      break
     }
   }
   const failTask = await fail.all()

@@ -49,4 +49,10 @@ export class RedisSet {
       this.client.smove(this.listKey, value, to, redisRes(resolve))
     })
   }
+
+  pop(): RedisPromise<string | null> {
+    return new Promise(resolve => {
+      this.client.spop(this.listKey, redisRes(resolve))
+    })
+  }
 }
