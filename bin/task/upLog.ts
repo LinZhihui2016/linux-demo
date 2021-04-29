@@ -1,3 +1,1 @@
-import { upLogTask } from "../../modules/up_log/task";
-
-upLogTask().then(() => process.exit(1))
+// upLogTask().then(() => process.exit(1))
