@@ -1,5 +1,5 @@
 import { handleTaskLv2, videoTaskLv0, videoTaskLv1 } from "./redis";
-import { getVideo } from "./mysql";
+import { getListByUpdated, getVideo } from "./mysql";
 import { postCreated } from "./api";
 import { sleep } from "../../util";
 
@@ -9,7 +9,12 @@ export const videoTask = async (): Promise<void> => {
   if (!bvid) {
     //0级仓库空了，准备把1级仓库放入0级
     const [e, len] = await handleTaskLv2()
-    if (e || !len) return
+    if (e || !len) {
+      //1级仓库还是空的,开始轮回
+      const [, video] = await getListByUpdated(10, 'ASC')
+      await videoTaskLv0().push((video || []).map(i => i.bvid))
+      return await videoTask()
+    }
     if (len) return await videoTask()
   }
   const [e] = await getVideo(bvid)

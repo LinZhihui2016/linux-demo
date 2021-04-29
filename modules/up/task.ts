@@ -1,6 +1,6 @@
 import { handleTaskLv2, upTaskLv0, upTaskLv1 } from "./redis";
 import { sleep } from "../../util";
-import { getUp } from "./mysql";
+import { getListByUpdated, getUp } from "./mysql";
 import { postCreated } from "./api";
 
 let errorTime = 0
@@ -9,7 +9,12 @@ export const upTask = async (): Promise<void> => {
   if (!mid) {
     //0级仓库空了，准备把1级仓库放入0级
     const [e, len] = await handleTaskLv2()
-    if (e || !len) return
+    if (e || !len) {
+      //1级仓库还是空的,开始轮回
+      const [, up] = await getListByUpdated(10, 'ASC')
+      await upTaskLv0().push((up || []).map(i => i.mid + ''))
+      return await upTask()
+    }
     if (len) return await upTask()
   }
   const [e] = await getUp(+mid)
@@ -29,7 +34,7 @@ export const upTask = async (): Promise<void> => {
     } else {
       await upTaskLv1().del(mid)
     }
-    await sleep(2000)
+    await sleep(5000)
   }
   await upTask()
 }
