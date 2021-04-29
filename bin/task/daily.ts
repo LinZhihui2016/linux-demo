@@ -3,12 +3,20 @@ import { checkVideo } from "../../modules/video/helper";
 import { checkUp } from "../../modules/up/helper";
 import { upLogTask } from "../../modules/up_log/task";
 import { videoLogTask } from "../../modules/video_log/task";
+import { infoLog } from "../../util/chalk";
+import { EventEmitter } from "events";
 
+EventEmitter.defaultMaxListeners = 0
 const daily = async () => {
+  infoLog('rankDailyTask')
   await rankDailyTask()
+  infoLog('checkVideo')
   await checkVideo()
+  infoLog('checkUp')
   await checkUp()
+  infoLog('upLogTask')
   await upLogTask()
+  infoLog('videoLogTask')
   await videoLogTask()
 }
 
