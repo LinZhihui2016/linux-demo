@@ -48,7 +48,7 @@ export class Mysql {
 
   delete(table: string, where?: string | Where): MysqlPromise<any> {
     const WHERE = where ? 'WHERE ' + (where instanceof Where ? where.get() : where) : ''
-    const sql = `DELETE FROM ${ table } WHERE ${ WHERE }`
+    const sql = `DELETE FROM ${ table } ${ WHERE }`
     return new Promise(resolve => this.connection.query(sql, mysqlRes(resolve)))
   }
 

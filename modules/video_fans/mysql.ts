@@ -10,24 +10,28 @@ import { VideoSql } from "../../tools/mysql/type";
 
 const VIDEO_FANS_TABLE = 'video_fans'
 
-export const getVideoFansLength = async (user: number): PRes<number, Res> => {
-  const fansCountWhere = new Where().eq('user_id', user)
+export const getVideoFansLength = async (user_id: number): PRes<number, Res> => {
+  const fansCountWhere = new Where().eq('user_id', user_id)
   const count = await $mysql.query<{ len: number }>(VIDEO_FANS_TABLE).where(fansCountWhere).count().find()
   if (count[0]) return [error(ErrBase.mysql读取失败, count[0].sql), null]
   return [null, count[1][0].len]
 }
-export const fansVideo = async (user: number, video_id: number): PRes<boolean, Res> => {
-  const [err, len] = await getVideoFansLength(user)
+export const fansVideo = async (user_id: number, video_id: number): PRes<boolean, Res> => {
+  const [err, len] = await getVideoFansLength(user_id)
   if (err) return [err, null]
   if (len! >= VIDEO_FANS_MAX) return [error(ErrVideo.关注数量达到上限, '关注数量达到上限'), null]
-  const data = { user, video_id, fans_time: new Date().getTime() }
+  const where = new Where().eq('user_id', user_id).eq('video_id', video_id)
+  const [e, isFans] = await $mysql.query<{ len: number }>(VIDEO_FANS_TABLE).where(where).count().find()
+  if (e) return [error(ErrVideo.关注失败, e.message), null]
+  if (isFans[0].len > 0) return [null, true]
+  const data = { user_id, video_id, fans_time: new Date().getTime() }
   const [err2] = await $mysql.insert(VIDEO_FANS_TABLE, data);
   if (err2) return [error(ErrVideo.关注失败), null]
   return [null, true]
 }
 
-export const unfansVideo = async (user: number, video_id: number): PRes<boolean, Res> => {
-  const where = new Where().eq('user', user).eq('video_id', video_id)
+export const unfansVideo = async (user_id: number, video_id: number): PRes<boolean, Res> => {
+  const where = new Where().eq('user_id', user_id).eq('video_id', video_id)
   const [err] = await $mysql.delete(VIDEO_FANS_TABLE, where)
   if (err) return [error(ErrVideo.取消关注失败), null]
   return [null, true]

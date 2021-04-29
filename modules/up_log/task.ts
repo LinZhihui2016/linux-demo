@@ -3,7 +3,6 @@ import { getListById } from "../up/mysql";
 import dayjs from "dayjs";
 import { apiLog } from "../../util/log";
 import { UpLogSql, UpSql } from "../../tools/mysql/type";
-import { sleep } from "../../util";
 import { saveUpLog } from "./mysql";
 import { postUpdated } from "../up/api";
 
@@ -25,7 +24,6 @@ export const upLogTask = async () => {
           apiLog().error(sql[0].message)
         }
       }
-      await sleep(3000)
     }
   }
 }

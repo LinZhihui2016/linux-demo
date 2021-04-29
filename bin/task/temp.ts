@@ -6,7 +6,7 @@ const temp = async () => {
   for (let i = 0; i < 100; i++) {
     const [, v] = await test.shift();
     await $redis.getHash('test2').calc(v)
-    await sleep(Math.ceil(Math.random() * 100))
+    await sleep(Math.ceil(Math.random() * 1000))
   }
 }
 temp().then(() => process.exit(1))
