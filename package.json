@@ -10,6 +10,7 @@
     "task:upLog": "ts-node bin/task/upLog.ts",
     "task:up": "ts-node bin/task/up.ts",
     "task:rank": "ts-node bin/task/rank.ts",
+    "task:today": "ts-node bin/task/daily.ts",
     "temp": "ts-node bin/task/temp.ts"
   },
   "dependencies": {
