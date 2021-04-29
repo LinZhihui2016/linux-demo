@@ -8,6 +8,7 @@ import { PRes } from "../../type";
 import { $mysql } from "../../tools/mysql";
 import { stdout } from "single-line-log";
 import { Where } from "../../tools/mysql/where";
+import { infoLog } from "../../util/chalk";
 
 export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<VideoSql, Res> => {
   let bvObj: VideoSql | null = null
@@ -20,6 +21,7 @@ export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<Vid
   }
   if (!bvObj) return [error(ErrBase.b站抓取失败, bv), null]
   const [err] = await saveVideo(bvObj)
+  !err && infoLog(bv + '保存成功')
   return err ? [error(ErrBase.mysql写入失败, err.sql), null] : [null, bvObj]
 }
 

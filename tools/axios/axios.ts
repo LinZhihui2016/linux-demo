@@ -9,7 +9,6 @@ import qs from "qs";
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
   private readonly options: AxiosRequestConfig;
-
   constructor(
       options: AxiosRequestConfig,
   ) {

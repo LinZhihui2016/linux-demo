@@ -2,6 +2,7 @@ import { $redis, redisTask } from "../../tools/redis";
 import { VideoSql } from "../../tools/mysql/type";
 import { PRes } from "../../type";
 import { HOUR } from "../../util";
+import { infoLog } from "../../util/chalk";
 
 export const getVideoCache = async (bv: string): PRes<VideoSql> => {
   const redisKey = (['bilibili', 'video', bv].join(':'))
@@ -45,8 +46,10 @@ export const handleTaskLv2 = async (): PRes<number> => {
     const count = +info[bv]
     if (count < 3) {
       await videoTaskLv0().push(bv)
+      infoLog(bv + ' 推入0级仓库')
     } else {
       await videoTaskLv2().set({ [bv]: count + '' })
+      infoLog(bv + ' 推入2级仓库')
     }
     await videoTaskLv2().del(bv)
   }

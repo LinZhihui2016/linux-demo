@@ -2,8 +2,10 @@ import { PRes } from "../../type";
 import { BangumiVideoSql, NormalVideoSql, VideoSql } from "../../tools/mysql/type";
 import { apiBvHtml, apiPgcInfo } from "../../crawler/video";
 import { BangumiVideo, NormalVideo } from "./type";
+import { sleep } from "../../util";
 
 export const fetchVideo = async (bv: string): PRes<VideoSql> => {
+  await sleep(2000)
   const [e1, text] = await apiBvHtml(bv)
   if (e1) return [e1, null]
   if (text!.match(/视频不见了/)) return [null, { type: 'deleted', bvid: bv }]

@@ -2,6 +2,7 @@ import { PRes } from "../../type";
 import { UpSql } from "../../tools/mysql/type";
 import { $redis, redisTask } from "../../tools/redis";
 import { HOUR } from "../../util";
+import { infoLog } from "../../util/chalk";
 
 export const getUpCache = async (mid: number): PRes<UpSql> => {
   const redisKey = (['bilibili', 'up', mid].join(':'))
@@ -32,14 +33,16 @@ export const handleTaskLv2 = async (): PRes<number> => {
   if (!len) return [null, len]
   const [e, info] = await upTaskLv1().get()
   if (e) return [e, null]
-  for (const bv of Object.keys(info)) {
-    const count = +info[bv]
+  for (const mid of Object.keys(info)) {
+    const count = +info[mid]
     if (count < 3) {
-      await upTaskLv0().push(bv)
+      await upTaskLv0().push(mid)
+      infoLog(mid + ' 推入0级仓库')
     } else {
-      await upTaskLv2().set({ [bv]: count + '' })
+      await upTaskLv2().set({ [mid]: count + '' })
+      infoLog(mid + ' 推入2级仓库')
     }
-    await upTaskLv2().del(bv)
+    await upTaskLv2().del(mid)
   }
   const [err, length] = await upTaskLv1().length();
   return err ? [err, null] : [null, length]

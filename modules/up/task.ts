@@ -31,7 +31,6 @@ export const upTask = async (): Promise<void> => {
     } else {
       await upTaskLv1().del(mid)
     }
-    await sleep(5000)
   }
   await upTask()
 }

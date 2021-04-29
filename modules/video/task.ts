@@ -31,7 +31,6 @@ export const videoTask = async (): Promise<void> => {
     } else {
       await videoTaskLv1().del(bvid)
     }
-    await sleep(2000)
   }
   await videoTask()
 }
