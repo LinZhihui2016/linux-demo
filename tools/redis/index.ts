@@ -8,6 +8,7 @@ import { RequestHandler } from "express";
 import { apiLog } from "../../util/log";
 import { infoLog } from "../../util/chalk";
 import { EventEmitter } from "events";
+import { RedisSet } from "./set";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -39,6 +40,7 @@ export class Redis {
   quit = () => new Promise(resolve => this.client.quit(redisRes(resolve, isOK)));
   getList = (key: string) => new RedisList(this, key);
   getHash = (key: string) => new RedisHash(this, key);
+  getSet = (key: string) => new RedisSet(this, key)
 }
 
 export const $redis = new Redis(redisConf.port, redisConf.host)
@@ -54,4 +56,4 @@ export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S
 export const isOK = (reply: string) => reply === 'OK'
 export const is1 = (reply: string | number) => (reply + '') === '1'
 
-export const redisTask = (k: 'video' | 'up', lv: 0 | 1 | 2 = 0) => ['bilibili', 'task', k, lv].join(':')
+export const redisTask = (k: 'video' | 'up', type: 'create' | 'update', lv: number = 0) => ['task', k, type, lv].join(':')

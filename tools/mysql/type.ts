@@ -47,6 +47,7 @@ export interface RankSql extends Type.Obj {
   rid: RankId
   date: string
   list: string
+  ups: string
 }
 
 export interface UpSql extends Type.Obj {

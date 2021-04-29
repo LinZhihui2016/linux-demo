@@ -1,7 +1,8 @@
 import { apiRank, RankId } from "../../crawler/ranking";
 import { apiLog } from "../../util/log";
-import { videoTaskLv0 } from "../video/redis";
 import { PRes } from "../../type";
+import { upSetAdd } from "../up/redis";
+import { videoSetAdd } from "../video/redis";
 
 export const fetchRank = async (rid: RankId): PRes<string[]> => {
   const [e, res] = await apiRank(rid)
@@ -9,8 +10,9 @@ export const fetchRank = async (rid: RankId): PRes<string[]> => {
   if (res && res.data) {
     const { data: { list } } = res
     const bvList = list.map(i => i.bvid)
-    // const upList = list.map(i => i.owner.mid)
-    await videoTaskLv0().push(bvList)
+    const upList = list.map(i => i.owner ? i.owner.mid + '' : '').filter(Boolean)
+    await upSetAdd(upList, 'storage')
+    await videoSetAdd(bvList, 'storage')
     return [null, bvList]
   } else {
     apiLog().error(rid + ' 没有列表')

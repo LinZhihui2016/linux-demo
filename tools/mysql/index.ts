@@ -32,7 +32,7 @@ export class Mysql {
         console.error('error connecting: ' + err.stack);
         return;
       }
-      infoLog(`mysql connect ${ host } ${ user } OK`)
+      infoLog(`mysql connect ${ host } ${ user } ${ database } OK`)
       this.isConnect = true
     });
   }

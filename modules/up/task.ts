@@ -1,36 +1,61 @@
-import { handleTaskLv2, upTaskLv0, upTaskLv1 } from "./redis";
+import { upCreateKey, upUpdateKey } from "./redis";
 import { sleep } from "../../util";
 import { getListByUpdated } from "./mysql";
 import { createdAndUpdated } from "./helper";
+import { $redis } from "../../tools/redis";
+import { infoLog } from "../../util/chalk";
+import { updateVideo, videoSet } from "../video/redis";
 
-let errorTime = 0
-export const upTask = async (): Promise<void> => {
-  const [, mid] = await upTaskLv0().shift()
+export const upUpdateTask = async () => {
+  const [, mid] = await $redis.getList(upUpdateKey(0)).shift()
   if (!mid) {
-    //0级仓库空了，准备把1级仓库放入0级
-    const [e, len] = await handleTaskLv2()
-    if (e || !len) {
-      //1级仓库还是空的,开始轮回
-      const [, up] = await getListByUpdated(10, 'ASC')
-      await upTaskLv0().push((up || []).map(i => i.mid + ''))
+    const [, hash] = await $redis.getHash(upUpdateKey(1)).get()
+    const lv1 = Object.keys(hash || {})
+    if (!lv1.length) {
+      const [, ups] = await getListByUpdated(10, 'ASC')
+      await updateVideo((ups || []).map(i => i.mid + ''))
       await sleep(1000 * 60)
-      return await upTask()
-    }
-    if (len) return await upTask()
-  }
-  await upTaskLv1().calc(mid)
-  const [, time] = await upTaskLv1().get(mid)
-  if ((time && +time <= 5)) {
-    const [err] = await createdAndUpdated(+mid)
-    if (err) {
-      errorTime++
-      if (errorTime >= 20) {
-        errorTime = 0;
-        await sleep(1000 * 60 * 10)
-      }
     } else {
-      await upTaskLv1().del(mid)
+      const queue: string[] = []
+      let i = 0;
+      for (const mid of lv1) {
+        const count = +hash[mid]
+        if (count < 3) {
+          queue.push(mid)
+        } else {
+          await $redis.getHash(upUpdateKey(1)).calc(mid, count)
+          i++
+        }
+      }
+      await updateVideo(queue[0])
+      infoLog(`up:update:1 ===> up:update:0 ,length = ${ queue.length }`)
+      infoLog(`up:update:1 ===> up:update:2 ,length = ${ i }`)
+      await sleep(1000 * 10)
+    }
+  } else {
+    await $redis.getHash(upUpdateKey(1)).calc(mid)
+    const [err2] = await createdAndUpdated(+mid)
+    if (!err2) {
+      await $redis.getHash(upCreateKey(1)).del(mid)
     }
   }
-  await upTask()
+  await sleep(10000)
+  await upUpdateTask();
+}
+
+export const upCreateTask = async () => {
+  const storage = $redis.getSet(videoSet('storage'))
+  const fail = $redis.getSet(videoSet('fail'))
+  const [, list] = await storage.diff(videoSet('sql'))
+  infoLog(list.length + '个up主')
+  for (const mid of list) {
+    const [err2] = await createdAndUpdated(+mid)
+    if (err2) {
+      await fail.add(mid)
+    } else {
+      await fail.del(mid)
+    }
+  }
+  const failTask = await fail.all()
+  console.log(failTask[1])
 }

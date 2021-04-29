@@ -1,3 +1,3 @@
-import { videoTask } from "../../modules/video/task";
+import { videoCreateTask } from "../../modules/video/task";
 
-videoTask().then(() => process.exit(1))
+videoCreateTask().then(() => process.exit())

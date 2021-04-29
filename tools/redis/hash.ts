@@ -1,5 +1,6 @@
 import redis from "redis";
 import { is1, isOK, Redis, RedisPromise, redisRes } from "./index";
+import { Type } from "../../type";
 
 export class RedisHash {
   client: redis.RedisClient;
@@ -43,12 +44,12 @@ export class RedisHash {
     })
   }
 
-  set(obj: { [key: string]: string }): RedisPromise<boolean> {
+  set(obj: Type.Obj<string>): RedisPromise<boolean> {
     const arg: string[] = []
-    for (const i in obj) {
+    Object.keys(obj).forEach(i => {
       arg.push(i)
-      arg.push(obj[i])
-    }
+      arg.push(obj[i]!)
+    })
     return new Promise((resolve) => {
       if (arg.length === 2) {
         this.client.hset(this.hashKey, arg[0], arg[1], redisRes(resolve, is1))

@@ -46,6 +46,11 @@ export const toInt = (s?: string, init = 0) => {
   if (isNaN(parseInt(s))) return init
   return parseInt(s)
 }
+
+export const setArr = <T>(arr: T[]): T[] =>
+    Array.from(new Set(arr))
+
+
 export const MINUTE = 60
 export const HOUR = MINUTE * 60
 export const DAY = HOUR * 24

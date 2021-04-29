@@ -1,13 +1,7 @@
-import { $redis } from "../../tools/redis";
-import { sleep } from "../../util";
+import { upCreateTask } from "../../modules/up/task";
 
 const temp = async () => {
-  const test = $redis.getList('test')
-  for (let i = 0; i < 100; i++) {
-    const [, v] = await test.shift();
-    await $redis.getHash('test2').calc(v)
-    await sleep(Math.ceil(Math.random() * 1000))
-  }
+  await upCreateTask()
 }
 temp().then(() => process.exit(1))
 

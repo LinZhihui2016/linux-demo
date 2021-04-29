@@ -2,7 +2,6 @@ import { PRes } from "../../type";
 import { UpSql } from "../../tools/mysql/type";
 import { $redis, redisTask } from "../../tools/redis";
 import { HOUR } from "../../util";
-import { infoLog } from "../../util/chalk";
 
 export const getUpCache = async (mid: number): PRes<UpSql> => {
   const redisKey = (['bilibili', 'up', mid].join(':'))
@@ -23,27 +22,15 @@ export const setUpCache = async (up: UpSql) => {
   await $redis.str.set({ [redisKey]: JSON.stringify(up) })
   await $redis.key.expire(redisKey, HOUR)
 }
+export const upSet = (type: 'sql' | 'storage') => ['set', 'up', type].join(':')
+export const upSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' = 'storage') => await $redis.getSet(upSet(type)).add(mid)
 
-export const upTaskLv0 = () => $redis.getList(redisTask('up', 0))
-export const upTaskLv1 = () => $redis.getHash(redisTask('up', 1))
-export const upTaskLv2 = () => $redis.getHash(redisTask('up', 2))
 
-export const handleTaskLv2 = async (): PRes<number> => {
-  const len = await upTaskLv1().length();
-  if (!len) return [null, len]
-  const [e, info] = await upTaskLv1().get()
-  if (e) return [e, null]
-  for (const mid of Object.keys(info)) {
-    const count = +info[mid]
-    if (count < 3) {
-      await upTaskLv0().push(mid)
-      infoLog(mid + ' 推入0级仓库')
-    } else {
-      await upTaskLv2().set({ [mid]: count + '' })
-      infoLog(mid + ' 推入2级仓库')
-    }
-    await upTaskLv2().del(mid)
-  }
-  const [err, length] = await upTaskLv1().length();
-  return err ? [err, null] : [null, length]
-}
+export const upTaskKey = (type: 'update' | 'create', lv: number) => redisTask('up', type, lv)
+export const upUpdateKey = (lv: number) => upTaskKey('update', lv)
+export const upCreateKey = (lv: number) => upTaskKey('create', lv)
+
+export const createUp = (mid: string | string[]) => $redis.getList(upCreateKey(0)).push(mid);
+export const newUp = (mid: string | string[]) => $redis.getList(upCreateKey(0)).unshift(mid)
+export const updateUp = (mid: string | string[]) => $redis.getList(upUpdateKey(0)).push(mid)
+

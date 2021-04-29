@@ -1,12 +1,11 @@
 import { VideoSql } from "../../tools/mysql/type";
-import { getVideoCache, setVideoCache, videoTaskLv0 } from "./redis";
+import { createVideo, getVideoCache, setVideoCache } from "./redis";
 import { fetchVideo } from "./fetch";
 import { saveVideo } from "./mysql";
 import { error, Res } from "../../helper";
 import { ErrBase } from "../../util/error";
 import { PRes } from "../../type";
 import { $mysql } from "../../tools/mysql";
-import { stdout } from "single-line-log";
 import { Where } from "../../tools/mysql/where";
 import { infoLog } from "../../util/chalk";
 
@@ -34,15 +33,11 @@ export const checkVideo = async () => {
   const set = new Set(tar)
   let j = 1;
   for (const i of set) {
-    stdout(j + '  ' + i)
     j++
     const [, l] = await $mysql.query<{ len: number }>('video').where(new Where().eq('bvid', i)).count().find()
     if (l && l[0].len === 1) {
       set.delete(i)
-    } else {
-      await videoTaskLv0().push(i)
     }
   }
-  stdout.clear();
-  console.log('\n');
+  await createVideo(Array.from(set))
 }

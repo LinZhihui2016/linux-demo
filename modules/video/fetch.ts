@@ -2,10 +2,9 @@ import { PRes } from "../../type";
 import { BangumiVideoSql, NormalVideoSql, VideoSql } from "../../tools/mysql/type";
 import { apiBvHtml, apiPgcInfo } from "../../crawler/video";
 import { BangumiVideo, NormalVideo } from "./type";
-import { sleep } from "../../util";
+import { postAdd } from "../up/api";
 
 export const fetchVideo = async (bv: string): PRes<VideoSql> => {
-  await sleep(2000)
   const [e1, text] = await apiBvHtml(bv)
   if (e1) return [e1, null]
   if (text!.match(/视频不见了/)) return [null, { type: 'deleted', bvid: bv }]
@@ -31,6 +30,7 @@ export const fetchVideo = async (bv: string): PRes<VideoSql> => {
       aid, title, pic, pubdate, desc, view, danmaku,
       reply, favorite, coin, share, like, type: 'normal'
     }
+    await postAdd({ mid: +mid })
     return [null, normalBv]
   } else if ('mediaInfo' in json) {
     const { h1Title: title, epInfo: { id, aid, bvid, cover: pic }, mediaInfo: { up_info } } = json
@@ -51,6 +51,7 @@ export const fetchVideo = async (bv: string): PRes<VideoSql> => {
       up_name: up_info.uname,
       up_mid: up_info.mid
     }
+    await postAdd({ mid: +up_info.mid })
     return [null, bangumiBv]
   } else {
     return [new Error(`b站解析INITIAL_STATE失败,bv:${ bv }`), null]

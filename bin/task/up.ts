@@ -1,3 +1,3 @@
-import { upTask } from "../../modules/up/task";
+import { upCreateTask } from "../../modules/up/task";
 
-upTask().then(() => process.exit(1))
+upCreateTask().then(() => process.exit(1))

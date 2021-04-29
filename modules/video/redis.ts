@@ -2,7 +2,6 @@ import { $redis, redisTask } from "../../tools/redis";
 import { VideoSql } from "../../tools/mysql/type";
 import { PRes } from "../../type";
 import { HOUR } from "../../util";
-import { infoLog } from "../../util/chalk";
 
 export const getVideoCache = async (bv: string): PRes<VideoSql> => {
   const redisKey = (['bilibili', 'video', bv].join(':'))
@@ -23,36 +22,13 @@ export const setVideoCache = async (video: VideoSql) => {
   await $redis.str.set({ [redisKey]: JSON.stringify(video) })
   await $redis.key.expire(redisKey, HOUR)
 }
+export const videoSet = (type: 'sql' | 'storage' | 'fail' ) => ['set', 'up', type].join(':')
+export const videoSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' | 'fail' = 'storage') => await $redis.getSet(videoSet(type)).add(mid)
 
-export const videoTaskLv0 = () => $redis.getList(redisTask('video', 0))
-export const videoTaskLv1 = () => $redis.getHash(redisTask('video', 1))
-export const videoTaskLv2 = () => $redis.getHash(redisTask('video', 2))
+export const videoTaskKey = (type: 'update' | 'create', lv: number) => redisTask('video', type, lv)
+export const videoUpdateKey = (lv: number) => videoTaskKey('update', lv)
+export const videoCreateKey = (lv: number) => videoTaskKey('create', lv)
 
-export const getVideoTaskLatest = async (): PRes<string> => {
-  const [e, bvid] = await $redis.getList(redisTask('video', 0)).shift()
-  if (bvid) {
-    await $redis.getHash(redisTask('video', 1)).calc(bvid)
-    return [null, bvid]
-  }
-  return [e!, null]
-}
-
-export const handleTaskLv2 = async (): PRes<number> => {
-  const len = await videoTaskLv1().length();
-  if (!len) return [null, len]
-  const [e, info] = await videoTaskLv1().get()
-  if (e) return [e, null]
-  for (const bv of Object.keys(info || {})) {
-    const count = +info[bv]
-    if (count < 3) {
-      await videoTaskLv0().push(bv)
-      infoLog(bv + ' 推入0级仓库')
-    } else {
-      await videoTaskLv2().set({ [bv]: count + '' })
-      infoLog(bv + ' 推入2级仓库')
-    }
-    await videoTaskLv2().del(bv)
-  }
-  const [err, length] = await videoTaskLv1().length();
-  return err ? [err, null] : [null, length]
-}
+export const createVideo = (bv: string | string[]) => $redis.getList(videoCreateKey(0)).push(bv);
+export const newVideo = (bv: string | string[]) => $redis.getList(videoCreateKey(0)).unshift(bv)
+export const updateVideo = (bv: string | string[]) => $redis.getList(videoUpdateKey(0)).push(bv)

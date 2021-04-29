@@ -1,21 +1,23 @@
 import { rankDailyTask } from "../../modules/rank/task";
-import { checkVideo } from "../../modules/video/helper";
-import { checkUp } from "../../modules/up/helper";
 import { upLogTask } from "../../modules/up_log/task";
 import { videoLogTask } from "../../modules/video_log/task";
 import { infoLog } from "../../util/chalk";
+import { upCreateTask } from "../../modules/up/task";
+import { videoCreateTask } from "../../modules/video/task";
 
 const daily = async () => {
-  infoLog('rankDailyTask')
+  infoLog('获取每日排行榜')
   await rankDailyTask()
-  infoLog('checkVideo')
-  await checkVideo()
-  infoLog('checkUp')
-  await checkUp()
-  infoLog('upLogTask')
+  // infoLog('从全部的排行榜里检查video是否全部添加')
+  // await checkVideo()
+  // infoLog('从全部的视频表里检查up主是否全部添加')
+  // await checkUp()
+  infoLog('每日获取关注的up主信息')
   await upLogTask()
-  infoLog('videoLogTask')
+  infoLog('每日获取关注的video信息')
   await videoLogTask()
+  infoLog('开始定时更新')
+  await Promise.all([upCreateTask(), videoCreateTask()])
 }
 
 daily().then(() => process.exit())
