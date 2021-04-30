@@ -5,7 +5,7 @@ import { sleep } from "../../util";
 
 export const fetchUp = async (mid: number): PRes<UpSql> => {
   const [e1, info] = await apiUserInfo(mid)
-  console.log(e1)
+  console.log('接收', e1)
   if (e1) return [e1, null]
   await sleep(300)
   const [e2, stat] = await apiUserStat(mid)
