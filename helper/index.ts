@@ -2,7 +2,7 @@ import { isArr } from "../util";
 import { Err, ErrBase } from "../util/error";
 import { Answer } from "../type";
 import { devChalk, errorChalk } from "../util/chalk";
-import { scriptLog } from "../tools/log4js/log";
+import { logInit, scriptLog } from "../tools/log4js/log";
 import { removeLock } from "../tools/redis";
 
 export class Res {
@@ -59,6 +59,7 @@ export const error = (err: Err, msg?: string | string[]) => new Res().error(err,
 export const success = (data: any, msg = '') => new Res().success(data, msg)
 
 export const scriptStart = (fn: () => Promise<any>) => {
+  logInit()
   scriptLog(`${ fn.name } start`)
   removeLock().then(() => {
     fn().catch(e => devChalk(e && e.message)).finally(() => process.exit(1))
