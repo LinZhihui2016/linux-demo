@@ -1,5 +1,5 @@
 import { createdAndUpdated } from "./helper";
-import { $redis } from "../../tools/redis";
+import { $redis, getTaskLock } from "../../tools/redis";
 import { $mysql } from "../../tools/mysql";
 import { upSet } from "./redis";
 import { UpSql } from "../../tools/mysql/type";
@@ -34,6 +34,8 @@ export const upCreateTask = async () => {
     await sleep(8000)
     const [, mid] = await wait.pop()
     if (mid) {
+      const lock = await getTaskLock('up')
+      if (lock) return
       const [err2] = await createdAndUpdated(+mid)
       if (err2) {
         await fail.add(mid)
@@ -52,6 +54,8 @@ export const upUpdateTask = async () => {
   scriptLog(`start up update, length ${ up.length }`)
   if (up) {
     for (const mid of up.map(i => i.mid)) {
+      const lock = await getTaskLock('up')
+      if (lock) return
       await createdAndUpdated(+mid)
     }
   }

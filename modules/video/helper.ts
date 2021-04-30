@@ -1,12 +1,10 @@
 import { VideoSql } from "../../tools/mysql/type";
-import { createVideo, getVideoCache, setVideoCache, videoSetAdd } from "./redis";
+import { getVideoCache, setVideoCache, videoSetAdd } from "./redis";
 import { fetchVideo } from "./fetch";
 import { saveVideo } from "./mysql";
 import { error, Res } from "../../helper";
 import { ErrBase } from "../../util/error";
 import { PRes } from "../../type";
-import { $mysql } from "../../tools/mysql";
-import { Where } from "../../tools/mysql/where";
 import { infoChalk } from "../../util/chalk";
 
 export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<VideoSql, Res> => {
@@ -29,20 +27,3 @@ export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<Vid
   }
 }
 
-export const checkVideo = async () => {
-  const [, list] = await $mysql.query<{ LIST: string }>('video_rank').select('list').find()
-  let tar: string[] = []
-  list.map(i => i.LIST).map(i => i.split(',')).forEach(i => {
-    tar = tar.concat(i)
-  })
-  const set = new Set(tar)
-  let j = 1;
-  for (const i of set) {
-    j++
-    const [, l] = await $mysql.query<{ len: number }>('video').where(new Where().eq('bvid', i)).count().find()
-    if (l && l[0].len === 1) {
-      set.delete(i)
-    }
-  }
-  await createVideo(Array.from(set))
-}

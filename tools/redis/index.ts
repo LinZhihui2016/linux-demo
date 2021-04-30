@@ -56,4 +56,13 @@ export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S
 export const isOK = (reply: string) => reply === 'OK'
 export const is1 = (reply: string | number) => (reply + '') === '1'
 
-export const redisTask = (k: 'video' | 'up', type: 'create' | 'update', lv: number = 0) => ['task', k, type, lv].join(':')
+export const setTaskLock = (key: 'up' | 'video') => $redis.str.set({ [`task:lock:${ key }`]: '1' })
+export const removeTaskLock = (key: 'up' | 'video') => $redis.str.set({ [`task:lock:${ key }`]: '0' })
+export const getTaskLock = async (key: 'up' | 'video') => {
+  const [, lock] = await $redis.str.get(`task:lock:${ key }`)
+  return lock === '1'
+}
+export const removeLock = async () => {
+  await $redis.str.set({ [`task:lock:up`]: '0' })
+  await $redis.str.set({ [`task:lock:video`]: '0' })
+}

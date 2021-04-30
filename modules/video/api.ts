@@ -3,11 +3,11 @@ import { error, success } from "../../helper";
 import { ErrBase, ErrVideo } from "../../util/error";
 import { getListByUpdated, getVideo } from "./mysql";
 import { fansVideo, fansVideoList, unfansVideo } from "../video_fans/mysql";
-import { createVideo, videoSet } from "./redis";
+import { videoSet, videoSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
 
 export const postAdd: Action<{ bv: string }> = async ({ bv }) => {
-  const [err] = await createVideo(bv)
+  const [err] = await videoSetAdd(bv, 'storage')
   return err ? error(ErrBase.redis写入失败) : success('加入任务列表成功')
 }
 export const getTask: Action = async () => {

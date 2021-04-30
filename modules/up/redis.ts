@@ -26,3 +26,7 @@ export const upSet = (type: 'sql' | 'storage' | 'fail' | 'wait') => ['set', 'up'
 export const upSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' | 'fail' | 'wait' = 'storage') => await $redis.getSet(upSet(type)).add(mid)
 
 
+export const getUpTaskLock = async () => {
+  const [, lock] = await $redis.str.get('task:lock:up')
+  return lock === '1'
+}

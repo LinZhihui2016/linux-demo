@@ -1,4 +1,4 @@
 import { upCreateTask } from "../../modules/up/task";
-import { scriptStart } from "../../tools/log4js/log";
+import { scriptStart } from "../../helper";
 
 scriptStart(upCreateTask)

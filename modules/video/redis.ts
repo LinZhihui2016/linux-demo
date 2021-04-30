@@ -1,4 +1,4 @@
-import { $redis, redisTask } from "../../tools/redis";
+import { $redis } from "../../tools/redis";
 import { VideoSql } from "../../tools/mysql/type";
 import { PRes } from "../../type";
 import { HOUR } from "../../util";
@@ -25,10 +25,10 @@ export const setVideoCache = async (video: VideoSql) => {
 export const videoSet = (type: 'sql' | 'storage' | 'fail' | 'wait') => ['set', 'video', type].join(':')
 export const videoSetAdd = async (mid: string[] | string, type: 'sql' | 'storage' | 'fail' | 'wait' = 'storage') => await $redis.getSet(videoSet(type)).add(mid)
 
-export const videoTaskKey = (type: 'update' | 'create', lv: number) => redisTask('video', type, lv)
-export const videoUpdateKey = (lv: number) => videoTaskKey('update', lv)
-export const videoCreateKey = (lv: number) => videoTaskKey('create', lv)
 
-export const createVideo = (bv: string | string[]) => $redis.getList(videoCreateKey(0)).push(bv);
-export const newVideo = (bv: string | string[]) => $redis.getList(videoCreateKey(0)).unshift(bv)
-export const updateVideo = (bv: string | string[]) => $redis.getList(videoUpdateKey(0)).push(bv)
+export const setVideoTaskLock = () => $redis.str.set({ 'task:lock:video': '1' })
+export const removeVideoTaskLock = () => $redis.str.set({ 'task:lock:video': '0' })
+export const getVideoTaskLock = async () => {
+  const [, lock] = await $redis.str.get('task:lock:video')
+  return lock === '1'
+}

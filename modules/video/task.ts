@@ -1,5 +1,5 @@
 import { $mysql } from "../../tools/mysql";
-import { $redis } from "../../tools/redis";
+import { $redis, getTaskLock } from "../../tools/redis";
 import { videoSet } from "./redis";
 import { createdAndUpdated } from "./helper";
 import { sleep } from "../../util";
@@ -33,6 +33,8 @@ export const videoCreateTask = async () => {
     await sleep(2000)
     const [, bv] = await wait.pop()
     if (bv) {
+      const lock = await getTaskLock('video')
+      if (lock) return
       const [err2] = await createdAndUpdated(bv)
       if (err2) {
         await fail.add(bv)
@@ -52,6 +54,8 @@ export const videoUpdateTask = async () => {
   scriptLog(`start video update, length ${ video.length }`)
   if (video) {
     for (const bvid of video.map(i => i.bvid)) {
+      const lock = await getTaskLock('video')
+      if (lock) return
       await createdAndUpdated(bvid)
     }
   }

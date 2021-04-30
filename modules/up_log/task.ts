@@ -5,8 +5,11 @@ import { UpLogSql, UpSql } from "../../tools/mysql/type";
 import { saveUpLog } from "./mysql";
 import { createdAndUpdated } from "../up/helper";
 import { sleep } from "../../util";
+import { getTaskLock } from "../../tools/redis";
 
 export const upLogTask = async () => {
+  const lock = await getTaskLock('up')
+  if (lock) return
   const [, allList] = await getAllUpInFans();
   const date = dayjs().startOf('date').valueOf()
   if (allList && allList.length) {

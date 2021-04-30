@@ -3,7 +3,8 @@ import { upLogTask } from "../../modules/up_log/task";
 import { videoLogTask } from "../../modules/video_log/task";
 import { checkUp, upCreateTask } from "../../modules/up/task";
 import { checkVideo, videoCreateTask } from "../../modules/video/task";
-import { scriptLog, scriptStart } from "../../tools/log4js/log";
+import { scriptLog} from "../../tools/log4js/log";
+import { scriptStart } from "../../helper";
 
 const daily = async () => {
   scriptLog('获取每日排行榜')

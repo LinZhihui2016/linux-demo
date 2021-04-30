@@ -5,8 +5,11 @@ import { VideoLogSql, VideoSqlBase_ } from "../../tools/mysql/type";
 import { saveVideoLog } from "./mysql";
 import { createdAndUpdated } from "../video/helper";
 import { sleep } from "../../util";
+import { getTaskLock } from "../../tools/redis";
 
 export const videoLogTask = async () => {
+  const lock = await getTaskLock('video')
+  if (lock) return
   const [, allList] = await getAllVideoInFans();
   const date = dayjs().startOf('date').valueOf()
   if (allList && allList.length) {

@@ -49,7 +49,3 @@ export const mysqlLog = (msg: Type.Obj<any> | string) => {
   return mysqlLog
 }
 
-export const scriptStart = (fn: () => Promise<any>) => {
-  scriptLog(`${ fn.name } start`)
-  fn().then(() => process.exit(1)).catch(e => errorLog(e && e.message))
-}
