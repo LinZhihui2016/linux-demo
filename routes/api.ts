@@ -24,7 +24,8 @@ export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.j
               ...body,
               time: `${ time }ms`,
               start: start.toLocaleString(),
-              end: end.toLocaleString()
+              end: end.toLocaleString(),
+              status: !body.err
             })
           }
       )
