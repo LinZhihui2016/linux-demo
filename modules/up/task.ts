@@ -20,7 +20,18 @@ export const checkUp = async () => {
   await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String))
   await sqlSet.add(sql.map(i => i.mid + ''))
 }
+export const taskBranch = async () => {
+  const storage = $redis.getSet(upSet('storage'))
+  const [, list] = await storage.diff(upSet('sql'))
+  if (list.length) {
+    await sleep(1000 * 10)
+    await upCreateTask()
+  } else {
+    await sleep(1000 * 60)
+    await upUpdateTask()
+  }
 
+}
 export const upCreateTask = async () => {
   const wait = $redis.getSet(upSet('wait'))
   const storage = $redis.getSet(upSet('storage'))
@@ -31,11 +42,11 @@ export const upCreateTask = async () => {
   await wait.add(list)
   await wait.del(failList)
   while (1) {
-    await sleep(8000)
     const [, mid] = await wait.pop()
     if (mid) {
       const lock = await getTaskLock('up')
       if (lock) return
+      await sleep(8000)
       const [err2] = await createdAndUpdated(+mid)
       if (err2) {
         await fail.add(mid)
@@ -46,7 +57,7 @@ export const upCreateTask = async () => {
       break
     }
   }
-  taskBranch()
+  await taskBranch()
 }
 
 export const upUpdateTask = async () => {
@@ -56,20 +67,10 @@ export const upUpdateTask = async () => {
     for (const mid of up.map(i => i.mid)) {
       const lock = await getTaskLock('up')
       if (lock) return
+      await sleep(10000)
       await createdAndUpdated(+mid)
     }
   }
-  taskBranch()
+  await taskBranch()
 }
 
-export const taskBranch = () => {
-  setTimeout(async () => {
-    const storage = $redis.getSet(upSet('storage'))
-    const [, list] = await storage.diff(upSet('sql'))
-    if (list.length) {
-      await upCreateTask()
-    } else {
-      await upUpdateTask()
-    }
-  }, 1000 * 60 * 5)
-}

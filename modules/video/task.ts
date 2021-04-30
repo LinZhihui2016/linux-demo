@@ -30,11 +30,11 @@ export const videoCreateTask = async () => {
   await wait.del(failList)
   scriptLog(`new video task, length ${ list.length }`)
   while (1) {
-    await sleep(2000)
     const [, bv] = await wait.pop()
     if (bv) {
       const lock = await getTaskLock('video')
       if (lock) return
+      await sleep(2000)
       const [err2] = await createdAndUpdated(bv)
       if (err2) {
         await fail.add(bv)
@@ -45,7 +45,7 @@ export const videoCreateTask = async () => {
       break
     }
   }
-  taskBranch()
+  await taskBranch()
 }
 
 
@@ -59,18 +59,18 @@ export const videoUpdateTask = async () => {
       await createdAndUpdated(bvid)
     }
   }
-  taskBranch()
+  await taskBranch()
 }
 
-export const taskBranch = () => {
-  setTimeout(async () => {
-    const storage = $redis.getSet(videoSet('storage'))
-    const [, list] = await storage.diff(videoSet('sql'))
-    if (list.length) {
-      await videoCreateTask()
-    } else {
-      await videoUpdateTask()
-    }
-  }, 1000 * 60 * 5)
+export const taskBranch = async () => {
+  const storage = $redis.getSet(videoSet('storage'))
+  const [, list] = await storage.diff(videoSet('sql'))
+  if (list.length) {
+    await sleep(1000 * 10)
+    await videoCreateTask()
+  } else {
+    await sleep(1000 * 60)
+    await videoUpdateTask()
+  }
 
 }

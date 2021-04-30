@@ -31,8 +31,10 @@ export const errorChalk = (msg?: string | string[]) => {
     console.log(chalk.red(i))
   })
 }
+let index = 0;
 export const devChalk = (msg?: string | string[]) => {
   isArr(msg).forEach(i => {
-    console.log(chalk.bgRed.white(i))
+    console.log(chalk.bgRed.white(i || index))
   })
+  index++;
 }

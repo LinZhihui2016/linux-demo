@@ -1,8 +1,8 @@
 import { isArr } from "../util";
 import { Err, ErrBase } from "../util/error";
 import { Answer } from "../type";
-import { errorChalk } from "../util/chalk";
-import { errorLog, scriptLog } from "../tools/log4js/log";
+import { devChalk, errorChalk } from "../util/chalk";
+import { scriptLog } from "../tools/log4js/log";
 import { removeLock } from "../tools/redis";
 
 export class Res {
@@ -61,6 +61,6 @@ export const success = (data: any, msg = '') => new Res().success(data, msg)
 export const scriptStart = (fn: () => Promise<any>) => {
   scriptLog(`${ fn.name } start`)
   removeLock().then(() => {
-    fn().then(() => process.exit(1)).catch(e => errorLog(e && e.message))
+    fn().catch(e => devChalk(e && e.message)).finally(() => process.exit(1))
   })
 }

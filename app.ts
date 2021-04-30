@@ -8,7 +8,7 @@ import { setupMysql } from "./tools/mysql";
 import { setupRedis } from "./tools/redis";
 import { apiIndex } from "./routes/api";
 import indexRouter from './routes'
-import { api2Log } from "./tools/log4js/log";
+import { apiLog } from "./tools/log4js/log";
 
 declare module 'express-serve-static-core' {
   interface Request {
@@ -38,7 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use((req, res, next) => {
   req.body = Object.assign({}, req.query, req.body, { user: 1 })
-  api2Log({ url: req.url, data: req.body })
+  apiLog({ url: req.url, data: req.body })
   next()
 })
 app.use(cookieParser());

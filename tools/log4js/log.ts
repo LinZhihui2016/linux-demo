@@ -5,11 +5,11 @@ import { expressChalk } from "../../util/chalk";
 export const logInit = () =>
     log4js.configure({
       appenders: {
-        api: { type: "dataFile", filename: 'api.log' },
-        script: { type: 'dataFile', filename: 'script.log' },
+        api: { type: "file", filename: 'api.log' },
+        script: { type: 'file', filename: 'script.log' },
         error: { type: 'file', filename: 'error.log' },
         mysql: { type: 'file', filename: 'mysql.log' },
-        redis: { type: 'redis', filename: 'redis.log' },
+        redis: { type: 'file', filename: 'redis.log' },
       },
       categories: {
         api: { appenders: ['api'], level: 'info' },
