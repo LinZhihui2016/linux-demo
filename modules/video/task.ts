@@ -26,8 +26,8 @@ export const videoCreateTask = async () => {
   const fail = $redis.getSet(videoSet('fail'))
   const [, list] = await storage.diff(videoSet('sql'))
   const [, failList] = await fail.all();
-  await wait.add(list)
-  await wait.del(failList)
+  list.length && await wait.add(list)
+  failList.length && await wait.del(failList)
   scriptLog(`new video task, length ${ list.length }`)
   while (1) {
     const [, bv] = await wait.pop()

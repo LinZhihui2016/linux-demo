@@ -37,8 +37,8 @@ export const upCreateTask = async () => {
   const [, list] = await storage.diff(upSet('sql'))
   const [, failList] = await fail.all();
   scriptLog(`new up task, length ${ list.length }`)
-  await wait.add(list)
-  await wait.del(failList)
+  list.length && await wait.add(list)
+  failList.length && await wait.del(failList)
   while (1) {
     const [, mid] = await wait.pop()
     if (mid) {
