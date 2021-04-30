@@ -31,3 +31,8 @@ export const errorChalk = (msg?: string | string[]) => {
     console.log(chalk.red(i))
   })
 }
+export const devChalk = (msg?: string | string[]) => {
+  isArr(msg).forEach(i => {
+    console.log(chalk.bgRed.white(i))
+  })
+}

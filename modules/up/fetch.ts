@@ -2,10 +2,11 @@ import { PRes } from "../../type";
 import { UpSql } from "../../tools/mysql/type";
 import { apiUserInfo, apiUserStat, apiUserUpstat } from "../../crawler/user";
 import { sleep } from "../../util";
+import { devChalk } from "../../util/chalk";
 
 export const fetchUp = async (mid: number): PRes<UpSql> => {
   const [e1, info] = await apiUserInfo(mid)
-  console.log('接收', e1)
+  e1 && devChalk(e1.message)
   if (e1) return [e1, null]
   await sleep(300)
   const [e2, stat] = await apiUserStat(mid)
