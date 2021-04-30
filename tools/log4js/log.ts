@@ -17,6 +17,7 @@ export const logInit = () =>
         error: { appenders: ['error'], level: 'error' },
         redis: { appenders: ['redis', 'error'], level: 'error' },
         mysql: { appenders: ['mysql', 'error'], level: 'error' },
+        default: { appenders: ['error'], level: 'error' }
       }
     })
 
