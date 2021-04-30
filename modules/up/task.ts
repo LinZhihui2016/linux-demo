@@ -24,10 +24,8 @@ export const taskBranch = async () => {
   const storage = $redis.getSet(upSet('storage'))
   const [, list] = await storage.diff(upSet('sql'))
   if (list.length) {
-    await sleep(1000 * 10)
     await upCreateTask()
   } else {
-    await sleep(1000 * 60)
     await upUpdateTask()
   }
 
@@ -46,17 +44,18 @@ export const upCreateTask = async () => {
     if (mid) {
       const lock = await getTaskLock('up')
       if (lock) return
-      await sleep(8000)
       const [err2] = await createdAndUpdated(+mid)
       if (err2) {
         await fail.add(mid)
       } else {
         await fail.del(mid)
       }
+      await sleep(8000)
     } else {
       break
     }
   }
+  await sleep(1000 * 60)
   await taskBranch()
 }
 
@@ -67,10 +66,11 @@ export const upUpdateTask = async () => {
     for (const mid of up.map(i => i.mid)) {
       const lock = await getTaskLock('up')
       if (lock) return
-      await sleep(10000)
       await createdAndUpdated(+mid, true)
+      await sleep(10000)
     }
   }
+  await sleep(1000 * 60)
   await taskBranch()
 }
 

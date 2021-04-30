@@ -34,17 +34,18 @@ export const videoCreateTask = async () => {
     if (bv) {
       const lock = await getTaskLock('video')
       if (lock) return
-      await sleep(2000)
       const [err2] = await createdAndUpdated(bv)
       if (err2) {
         await fail.add(bv)
       } else {
         await fail.del(bv)
       }
+      await sleep(2000)
     } else {
       break
     }
   }
+  await sleep(1000 * 60)
   await taskBranch()
 }
 
@@ -56,10 +57,11 @@ export const videoUpdateTask = async () => {
     for (const bvid of video.map(i => i.bvid)) {
       const lock = await getTaskLock('video')
       if (lock) return
-      await sleep(2000)
       await createdAndUpdated(bvid, true)
+      await sleep(2000)
     }
   }
+  await sleep(1000 * 60)
   await taskBranch()
 }
 
@@ -67,10 +69,8 @@ export const taskBranch = async () => {
   const storage = $redis.getSet(videoSet('storage'))
   const [, list] = await storage.diff(videoSet('sql'))
   if (list.length) {
-    await sleep(1000 * 10)
     await videoCreateTask()
   } else {
-    await sleep(1000 * 60)
     await videoUpdateTask()
   }
 
