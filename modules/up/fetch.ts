@@ -4,7 +4,6 @@ import { apiUserInfo, apiUserStat, apiUserUpstat } from "../../crawler/user";
 import { sleep } from "../../util";
 
 export const fetchUp = async (mid: number): PRes<UpSql> => {
-  await sleep(8000)
   const [e1, info] = await apiUserInfo(mid)
   if (e1) return [e1, null]
   await sleep(300)

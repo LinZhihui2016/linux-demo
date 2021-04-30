@@ -4,7 +4,7 @@ import { PRes } from "../../type";
 import { upSetAdd } from "../up/redis";
 import { videoSetAdd } from "../video/redis";
 
-export const fetchRank = async (rid: RankId): PRes<string[]> => {
+export const fetchRank = async (rid: RankId): PRes<{ upList: string[], bvList: string[] }> => {
   const [e, res] = await apiRank(rid)
   if (e) return [e, null]
   if (res && res.data) {
@@ -13,7 +13,7 @@ export const fetchRank = async (rid: RankId): PRes<string[]> => {
     const upList = list.map(i => i.owner ? i.owner.mid + '' : '').filter(Boolean)
     await upSetAdd(upList, 'storage')
     await videoSetAdd(bvList, 'storage')
-    return [null, bvList]
+    return [null, { bvList, upList }]
   } else {
     apiLog().error(rid + ' 没有列表')
     return [new Error(rid + '没有列表'), null]

@@ -1,1 +1,3 @@
-// rankDailyTask().then(() => process.exit(1))
+import { rankDailyTask } from "../../modules/rank/task";
+
+rankDailyTask().then(() => process.exit(1))

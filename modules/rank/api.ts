@@ -10,11 +10,14 @@ import { getListByBv } from "../video/mysql";
 export const postUpdate: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
   if (!rid) return error(ErrBase.参数错误)
   let list: string[] | null = null
-  if (!noCache) [, list] = await getRankCache(rid)
+  if (!noCache) {
+    const [, cache] = await getRankCache(rid)
+    cache && (list = cache.bvList)
+  }
   if (!list) {
     const [, data] = await fetchRank(rid)
     data && await setRankCache(data, rid)
-    list = data
+    data && (list = data.bvList);
   }
   if (!list) return error(ErrBase.b站抓取失败, rid + '')
   const [err] = await saveRank(list, rid)

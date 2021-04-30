@@ -1,79 +1,46 @@
-import { getListByUpdated, getVideo } from "./mysql";
-import { sleep } from "../../util";
-import { createdAndUpdated } from "./helper";
+import { $mysql } from "../../tools/mysql";
 import { $redis } from "../../tools/redis";
+import { videoSet } from "./redis";
 import { infoLog } from "../../util/chalk";
-import { createVideo, updateVideo, videoCreateKey, videoUpdateKey } from "./redis";
+import { createdAndUpdated } from "./helper";
+import { sleep } from "../../util";
 
-
-export const videoUpdateTask = async () => {
-  const [, bvid] = await $redis.getList(videoUpdateKey(0)).shift()
-  if (!bvid) {
-    const [, hash] = await $redis.getHash(videoUpdateKey(1)).get()
-    const lv1 = Object.keys(hash || {})
-    if (!lv1.length) {
-      const [, video] = await getListByUpdated(10, 'ASC')
-      await updateVideo((video || []).map(i => i.bvid))
-      await sleep(1000 * 60)
-    } else {
-      const queue: string[] = []
-      let i = 0;
-      for (const bv of lv1) {
-        const count = +hash[bv]
-        if (count < 3) {
-          queue.push(bv)
-        } else {
-          await $redis.getHash(videoUpdateKey(1)).calc(bv, count)
-          i++
-        }
-      }
-      await updateVideo(queue[0])
-      infoLog(`video:update:1 ===> video:update:0 ,length = ${ queue.length }`)
-      infoLog(`video:update:1 ===> video:update:2 ,length = ${ i }`)
-      await sleep(1000 * 10)
-    }
-  } else {
-    await $redis.getHash(videoUpdateKey(1)).calc(bvid)
-    const [err2] = await createdAndUpdated(bvid)
-    if (!err2) {
-      await $redis.getHash(videoCreateKey(1)).del(bvid)
-    }
-  }
-  await sleep(2000)
-  await videoUpdateTask();
+export const checkVideo = async () => {
+  const [err, storage] = await $mysql.query<{ LIST: string }>('video_rank').select('list').find()
+  if (err) return
+  const [err2, sql] = await $mysql.query<{ BVID: string }>('video').select('BVID').distinct().find()
+  if (err2) return
+  const storageSet = $redis.getSet(videoSet('storage'))
+  const sqlSet = $redis.getSet(videoSet('sql'))
+  await storageSet.clear()
+  await sqlSet.clear()
+  await storageSet.add(storage.map(i => i.LIST.split(',')).reduce((a, b) => a.concat(b), []))
+  await sqlSet.add(sql.map(i => i.BVID))
 }
 
 export const videoCreateTask = async () => {
-  const [, bvid] = await $redis.getList(videoCreateKey(0)).shift()
-  if (!bvid) {
-    const [, hash] = await $redis.getHash(videoCreateKey(1)).get()
-    const lv1 = Object.keys(hash || {})
-    if (!lv1.length) return await videoUpdateTask();
-    const queue: string[] = []
-    let i = 0;
-    for (const bv of lv1) {
-      const count = +hash[bv]
-      if (count < 3) {
-        queue.push(bv)
+  const wait = $redis.getSet(videoSet('wait'))
+  const storage = $redis.getSet(videoSet('storage'))
+  const fail = $redis.getSet(videoSet('fail'))
+  const [, list] = await storage.diff(videoSet('sql'))
+  const [, failList] = await fail.all();
+  infoLog(list.length + '个视频')
+  await wait.add(list)
+  await wait.del(failList)
+  while (1) {
+    await sleep(2000)
+    const [, bv] = await wait.pop()
+    if (bv) {
+      const [err2] = await createdAndUpdated(bv)
+      if (err2) {
+        await fail.add(bv)
       } else {
-        await $redis.getHash(videoCreateKey(1)).calc(bv, count)
-        i++
+        await fail.del(bv)
       }
-    }
-    await createVideo(queue[0])
-    infoLog(`video:create:1 ===> video:create:0 ,length = ${ queue.length }`)
-    infoLog(`video:create:1 ===> video:create:2 ,length = ${ i }`)
-    await sleep(1000 * 10)
-  } else {
-    await $redis.getHash(videoCreateKey(1)).calc(bvid)
-    const [err] = await getVideo(bvid)
-    if (err && err.message === '未收录') {//未收录
-      const [err2] = await createdAndUpdated(bvid)
-      if (!err2) {
-        await $redis.getHash(videoCreateKey(1)).del(bvid)
-      }
+    } else {
+      break
     }
   }
-  await sleep(2000)
-  await videoCreateTask();
+  const failTask = await fail.all()
+  console.log(failTask[1])
 }

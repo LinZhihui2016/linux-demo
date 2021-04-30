@@ -1,7 +1,7 @@
-import { upCreateTask } from "../../modules/up/task";
+import { rankDailyTask } from "../../modules/rank/task";
 
 const temp = async () => {
-  await upCreateTask()
+  await rankDailyTask()
 }
 temp().then(() => process.exit(1))
 

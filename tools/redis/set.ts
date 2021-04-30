@@ -32,7 +32,7 @@ export class RedisSet {
     })
   }
 
-  del(value: string): RedisPromise<string[]> {
+  del(value: string | string[]): RedisPromise<string[]> {
     return new Promise(resolve => {
       this.client.srem(this.listKey, value, redisRes(resolve))
     })
@@ -53,6 +53,12 @@ export class RedisSet {
   pop(): RedisPromise<string | null> {
     return new Promise(resolve => {
       this.client.spop(this.listKey, redisRes(resolve))
+    })
+  }
+
+  clear(): RedisPromise<0 | 1> {
+    return new Promise(resolve => {
+      this.client.del(this.listKey, redisRes(resolve))
     })
   }
 }

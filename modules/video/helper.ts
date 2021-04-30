@@ -1,5 +1,5 @@
 import { VideoSql } from "../../tools/mysql/type";
-import { createVideo, getVideoCache, setVideoCache } from "./redis";
+import { createVideo, getVideoCache, setVideoCache, videoSetAdd } from "./redis";
 import { fetchVideo } from "./fetch";
 import { saveVideo } from "./mysql";
 import { error, Res } from "../../helper";
@@ -20,8 +20,13 @@ export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<Vid
   }
   if (!bvObj) return [error(ErrBase.b站抓取失败, bv), null]
   const [err] = await saveVideo(bvObj)
-  !err && infoLog(bv + '保存成功')
-  return err ? [error(ErrBase.mysql写入失败, err.sql), null] : [null, bvObj]
+  if (err) {
+    return [error(ErrBase.mysql写入失败, err.sql), null]
+  } else {
+    infoLog(bv + '保存成功')
+    await videoSetAdd(bv)
+    return [null, bvObj]
+  }
 }
 
 export const checkVideo = async () => {

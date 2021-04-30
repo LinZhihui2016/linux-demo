@@ -1,56 +1,35 @@
-import { upCreateKey, upUpdateKey } from "./redis";
-import { sleep } from "../../util";
-import { getListByUpdated } from "./mysql";
 import { createdAndUpdated } from "./helper";
 import { $redis } from "../../tools/redis";
 import { infoLog } from "../../util/chalk";
-import { updateVideo, videoSet } from "../video/redis";
+import { $mysql } from "../../tools/mysql";
+import { upSet } from "./redis";
+import { UpSql } from "../../tools/mysql/type";
+import { sleep } from "../../util";
 
-export const upUpdateTask = async () => {
-  const [, mid] = await $redis.getList(upUpdateKey(0)).shift()
-  if (!mid) {
-    const [, hash] = await $redis.getHash(upUpdateKey(1)).get()
-    const lv1 = Object.keys(hash || {})
-    if (!lv1.length) {
-      const [, ups] = await getListByUpdated(10, 'ASC')
-      await updateVideo((ups || []).map(i => i.mid + ''))
-      await sleep(1000 * 60)
-    } else {
-      const queue: string[] = []
-      let i = 0;
-      for (const mid of lv1) {
-        const count = +hash[mid]
-        if (count < 3) {
-          queue.push(mid)
-        } else {
-          await $redis.getHash(upUpdateKey(1)).calc(mid, count)
-          i++
-        }
-      }
-      await updateVideo(queue[0])
-      infoLog(`up:update:1 ===> up:update:0 ,length = ${ queue.length }`)
-      infoLog(`up:update:1 ===> up:update:2 ,length = ${ i }`)
-      await sleep(1000 * 10)
-    }
-  } else {
-    await $redis.getHash(upUpdateKey(1)).calc(mid)
-    const [err2] = await createdAndUpdated(+mid)
-    if (!err2) {
-      await $redis.getHash(upCreateKey(1)).del(mid)
-    }
-  }
-  await sleep(10000)
-  await upUpdateTask();
+export const checkUp = async () => {
+  const [err, storage] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct().find()
+  if (err) return
+  const [err2, sql] = await $mysql.query<UpSql>('up').distinct().find()
+  if (err2) return
+  const storageSet = $redis.getSet(upSet('storage'))
+  const sqlSet = $redis.getSet(upSet('sql'))
+  await storageSet.clear()
+  await sqlSet.clear()
+  await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String))
+  await sqlSet.add(sql.map(i => i.mid + ''))
 }
 
 export const upCreateTask = async () => {
-  const wait = $redis.getSet(videoSet('wait'))
-  const storage = $redis.getSet(videoSet('storage'))
-  const fail = $redis.getSet(videoSet('fail'))
-  const [, list] = await storage.diff(videoSet('sql'))
+  const wait = $redis.getSet(upSet('wait'))
+  const storage = $redis.getSet(upSet('storage'))
+  const fail = $redis.getSet(upSet('fail'))
+  const [, list] = await storage.diff(upSet('sql'))
+  const [, failList] = await fail.all();
   infoLog(list.length + '个up主')
   await wait.add(list)
+  await wait.del(failList)
   while (1) {
+    await sleep(8000)
     const [, mid] = await wait.pop()
     if (mid) {
       const [err2] = await createdAndUpdated(+mid)

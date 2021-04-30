@@ -5,6 +5,7 @@ import { apiLog } from "../../util/log";
 import { VideoLogSql, VideoSqlBase_ } from "../../tools/mysql/type";
 import { saveVideoLog } from "./mysql";
 import { createdAndUpdated } from "../video/helper";
+import { sleep } from "../../util";
 
 export const videoLogTask = async () => {
   const [, allList] = await getAllVideoInFans();
@@ -13,6 +14,7 @@ export const videoLogTask = async () => {
     const [err, list] = await getListById<{ BVID: string, ID: number }>(allList, ['bvid', 'id']);
     if (err) return apiLog().error(err.message)
     for (const item of list!) {
+      await sleep(2000)
       const { ID, BVID } = item
       const [, data] = await createdAndUpdated(BVID, true)
       if (data) {
