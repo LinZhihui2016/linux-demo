@@ -66,6 +66,7 @@ export const videoUpdateTask = async () => {
 }
 
 export const taskBranch = async () => {
+  if (new Date().getHours() >= 23) return;
   const storage = $redis.getSet(videoSet('storage'))
   const [, list] = await storage.diff(videoSet('sql'))
   if (list.length) {

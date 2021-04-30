@@ -21,6 +21,7 @@ export const checkUp = async () => {
   await sqlSet.add(sql.map(i => i.mid + ''))
 }
 export const taskBranch = async () => {
+  if (new Date().getHours() >= 23) return;
   const storage = $redis.getSet(upSet('storage'))
   const [, list] = await storage.diff(upSet('sql'))
   if (list.length) {
