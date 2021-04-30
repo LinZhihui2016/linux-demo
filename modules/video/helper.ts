@@ -24,7 +24,7 @@ export const createdAndUpdated = async (bv: string, noCache?: boolean): PRes<Vid
     return [error(ErrBase.mysql写入失败, err.sql), null]
   } else {
     infoLog(bv + '保存成功')
-    await videoSetAdd(bv)
+    await videoSetAdd(bv, 'sql')
     return [null, bvObj]
   }
 }
