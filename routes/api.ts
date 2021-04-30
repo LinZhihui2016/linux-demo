@@ -2,6 +2,7 @@ import * as fs from "fs";
 import path from "path";
 import { Action, Type } from "../type";
 import { Express } from "express";
+import { $date } from "../util/date";
 
 export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.join(dirname, 'modules')).forEach(module => {
   const apiFile = path.join(dirname, 'modules', module, 'api.ts')
@@ -23,8 +24,8 @@ export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.j
             res.status(status || 200).send({
               ...body,
               time: `${ time }ms`,
-              start: start.toLocaleString(),
-              end: end.toLocaleString(),
+              start: $date(start),
+              end: $date(end),
               status: !body.err
             })
           }
