@@ -5,8 +5,8 @@ import { Query } from "./query";
 import { Where } from "./where";
 import { Type } from "../../type";
 import { $date } from "../../util/date";
-import { apiLog } from "../../util/log";
-import { infoLog } from "../../util/chalk";
+import { mysqlLog } from "../log4js/log";
+import { infoChalk } from "../../util/chalk";
 import { EventEmitter } from "events";
 
 declare module 'express-serve-static-core' {
@@ -32,7 +32,7 @@ export class Mysql {
         console.error('error connecting: ' + err.stack);
         return;
       }
-      infoLog(`mysql connect ${ host } ${ user } ${ database } OK`)
+      infoChalk(`mysql connect ${ host } ${ user } ${ database } OK`)
       this.isConnect = true
     });
   }
@@ -77,6 +77,6 @@ export type MysqlCb<T> = [MysqlError | null, T[]]
 export type MysqlPromise<T> = Promise<MysqlCb<T>>
 export const mysqlRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S) => any) =>
     (err: MysqlError | null, result: S) => {
-      err && apiLog().error(err.sql)
+      err && mysqlLog(err.message)(err.sql!)
       resolve([err, fn ? fn(result) : result])
     }

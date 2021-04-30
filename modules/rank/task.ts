@@ -1,6 +1,5 @@
 import { RankId } from "../../crawler/ranking";
 import { PRes } from "../../type";
-import { apiLog } from "../../util/log";
 import { postUpdate } from "./api";
 import { sleep } from "../../util";
 
@@ -9,10 +8,8 @@ const helper = async (rid: RankId, retry = 0): PRes<string> => {
   const { err, msg } = res.json.body
   if (err) {
     const m = [err, msg].join('|')
-    apiLog().error(m)
     return retry < 3 ? helper(rid, retry + 1) : [new Error(m), null]
   } else {
-    apiLog().info(rid + ' OK')
     return [null, 'OK']
   }
 }

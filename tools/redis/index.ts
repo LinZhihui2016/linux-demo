@@ -5,8 +5,8 @@ import { RedisHash } from "./hash";
 import { RedisKey } from "./key";
 import redisConf from '../../conf/redis.json'
 import { RequestHandler } from "express";
-import { apiLog } from "../../util/log";
-import { infoLog } from "../../util/chalk";
+import { redisLog } from "../log4js/log";
+import { infoChalk } from "../../util/chalk";
 import { EventEmitter } from "events";
 import { RedisSet } from "./set";
 
@@ -31,7 +31,7 @@ export class Redis {
     this.client.on('connect', () => {
       EventEmitter.defaultMaxListeners = 0
       this.isConnect = true
-      infoLog(`redis connect ${ host }:${ port } OK`)
+      infoChalk(`redis connect ${ host }:${ port } OK`)
     })
     this.str = new RedisStr(this)
     this.key = new RedisKey(this)
@@ -50,7 +50,7 @@ export const setupRedis: RequestHandler = (req, res, next) => {
 }
 export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S) => any) =>
     (err: Error | null, reply: S) => {
-      err && apiLog().error(err.message)
+      err && redisLog(err.message)
       resolve([err, fn ? fn(reply) : reply])
     }
 export const isOK = (reply: string) => reply === 'OK'

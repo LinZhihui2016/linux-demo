@@ -5,7 +5,7 @@ import { ErrBase } from "../../util/error";
 import { getUpCache, setUpCache, upSetAdd } from "./redis";
 import { fetchUp } from "./fetch";
 import { saveUp } from "./mysql";
-import { infoLog } from "../../util/chalk";
+import { infoChalk } from "../../util/chalk";
 
 export const createdAndUpdated = async (mid: number, noCache?: boolean): PRes<UpSql, Res> => {
   let upObj: UpSql | null = null
@@ -21,7 +21,7 @@ export const createdAndUpdated = async (mid: number, noCache?: boolean): PRes<Up
   if (err) {
     return [error(ErrBase.mysql写入失败, err.sql), null]
   } else {
-    infoLog(mid + '保存成功')
+    infoChalk(mid + '保存成功')
     await upSetAdd(mid + '', "sql")
     return [null, upObj]
   }

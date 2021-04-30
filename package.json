@@ -4,10 +4,7 @@
   "private": true,
   "scripts": {
     "start": "ts-node bin/www.ts",
-    "dev": "ts-node bin/script.ts",
     "task:bv": "ts-node bin/task/bv.ts",
-    "task:bvLog": "ts-node bin/task/bvLog.ts",
-    "task:upLog": "ts-node bin/task/upLog.ts",
     "task:up": "ts-node bin/task/up.ts",
     "task:rank": "ts-node bin/task/rank.ts",
     "task:today": "ts-node bin/task/daily.ts",

@@ -1,3 +1,4 @@
 import { videoCreateTask } from "../../modules/video/task";
+import { scriptStart } from "../../tools/log4js/log";
 
-videoCreateTask().then(() => process.exit())
+scriptStart(videoCreateTask)

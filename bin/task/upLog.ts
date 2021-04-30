@@ -1,1 +1,0 @@
-// upLogTask().then(() => process.exit(1))

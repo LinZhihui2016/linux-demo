@@ -1,5 +1,4 @@
 import { apiRank, RankId } from "../../crawler/ranking";
-import { apiLog } from "../../util/log";
 import { PRes } from "../../type";
 import { upSetAdd } from "../up/redis";
 import { videoSetAdd } from "../video/redis";
@@ -15,7 +14,6 @@ export const fetchRank = async (rid: RankId): PRes<{ upList: string[], bvList: s
     await videoSetAdd(bvList, 'storage')
     return [null, { bvList, upList }]
   } else {
-    apiLog().error(rid + ' 没有列表')
     return [new Error(rid + '没有列表'), null]
   }
 }

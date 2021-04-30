@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import path from "path";
 import { Action, Type } from "../type";
-import { expressLog } from "../util/chalk";
 import { Express } from "express";
 
 export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.join(dirname, 'modules')).forEach(module => {
@@ -21,7 +20,6 @@ export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.j
             const end = new Date()
             const start = req.start
             const time = end.getTime() - start.getTime()
-            expressLog(`${ req.url } finish ${ time }ms`)
             res.status(status || 200).send({
               ...body,
               time: `${ time }ms`,

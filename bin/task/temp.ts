@@ -1,7 +1,7 @@
 import { rankDailyTask } from "../../modules/rank/task";
+import { scriptStart } from "../../tools/log4js/log";
 
 const temp = async () => {
   await rankDailyTask()
 }
-temp().then(() => process.exit(1))
-
+scriptStart(temp)

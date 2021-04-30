@@ -3,4 +3,6 @@
 /.idea/
 .log
 .DS_Store
-error.log
+*.log
+/nohup.out
+/**/nohup.out

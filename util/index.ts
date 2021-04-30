@@ -1,4 +1,4 @@
-import { sleepLog } from "./chalk";
+import { sleepChalk } from "./chalk";
 import dayjs from "dayjs";
 import { Type } from "../type";
 
@@ -14,7 +14,7 @@ export const isArr = <T>(arr: T | T[]): T[] => Array.isArray(arr) ? arr : [arr]
 export const today = () => new Date().toLocaleDateString()
 
 export const sleep = (ms: number) => {
-  sleepLog(ms)
+  sleepChalk(ms)
   return new Promise<void>(resolve => setTimeout(() => resolve(), ms))
 }
 export const transWan = (str: string) => {

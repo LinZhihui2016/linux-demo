@@ -1,14 +1,15 @@
 import Axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { apiLog } from "../../util/log";
+import { errorLog } from "../log4js/log";
 import axiosRetry from "axios-retry";
 import { PRes, Type } from "../../type";
-import { ajaxLog } from "../../util/chalk";
+import { ajaxChalk } from "../../util/chalk";
 import { $redis } from "../redis";
 import qs from "qs";
 
 export default class NodeAxios {
   axiosInstance: AxiosInstance;
   private readonly options: AxiosRequestConfig;
+
   constructor(
       options: AxiosRequestConfig,
   ) {
@@ -20,7 +21,7 @@ export default class NodeAxios {
           shouldResetTimeout: true,
           retryDelay: () => 5000,
           retryCondition: (error) => {
-            apiLog().error(error.config.url + ' retry')
+            errorLog(error.config.url + ' retry')
             return true
           }
         })
@@ -34,7 +35,7 @@ export default class NodeAxios {
         ...req.headers,
         cookie
       }
-      ajaxLog('axios：' + req.baseURL + '/' + req.url + '?' + qs.stringify(req.params))
+      ajaxChalk('axios：' + req.baseURL + '/' + req.url + '?' + qs.stringify(req.params))
       return req
     })
     this.axiosInstance.interceptors.response.use(res => {
@@ -44,12 +45,12 @@ export default class NodeAxios {
         const { url } = err.config
         try {
           const retryState = err.config['axios-retry']
-          apiLog().error(`${ url }第${ retryState.retryCount }次错误：${ err.response.status } ${ err.message }`)
+          errorLog(`${ url }第${ retryState.retryCount }次错误：${ err.response.status } ${ err.message }`)
         } catch (e) {
-          apiLog().error(`${ url } ${ err.response.status } ${ err.message }`)
+          errorLog(`${ url } ${ err.response.status } ${ err.message }`)
         }
       } else {
-        apiLog().error(err.message)
+        errorLog(err.message)
       }
       return Promise.reject(err)
     })

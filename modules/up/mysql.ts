@@ -20,10 +20,9 @@ export const getUp = async (mid: number): PRes<UpSql> => {
   return [null, info[0]]
 }
 
-export const getListById = async <T = UpSql>(list: number[], select: string | string[] = '*'): PRes<T[]> => {
+export const getListById = async <T = UpSql>(list: number[], select: string | string[] = '*') => {
   const where = new Where().in('id', list)
-  const [e, up] = await $mysql.query<T>(UP_TABLE).select(select).where(where).orderBy('id', list).find();
-  return e ? [e, null] : [null, up]
+  return $mysql.query<T>(UP_TABLE).select(select).where(where).orderBy('id', list).find();
 }
 export const getListByUpdated = (count: number, orderBy: 'ASC' | 'DESC') => {
   return $mysql.query<UpSql>(UP_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();

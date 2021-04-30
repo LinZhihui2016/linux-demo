@@ -1,8 +1,7 @@
 import { isArr } from "../util";
 import { Err, ErrBase } from "../util/error";
 import { Answer } from "../type";
-import { apiLog } from "../util/log";
-import { errorLog } from "../util/chalk";
+import { errorChalk } from "../util/chalk";
 
 export class Res {
   constructor(public data = {}, public msg: string[] | string = '', public err: number | number[] | string[] | string = 0, public status = 200) {
@@ -19,8 +18,7 @@ export class Res {
   error(err: Err, msg?: string | string[]) {
     this.err = err
     this.msg = [ErrBase[err], ...isArr(msg || '')].filter(Boolean)
-    errorLog(msg)
-    apiLog().error(msg)
+    errorChalk(msg)
     return this
   }
 
@@ -30,6 +28,7 @@ export class Res {
     this.msg = msg
     return this
   }
+
   isArr = false;
 }
 

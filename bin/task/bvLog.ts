@@ -1,1 +1,0 @@
-// videoLogTask().then(() => process.exit(1))

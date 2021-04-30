@@ -1,11 +1,11 @@
 import { createdAndUpdated } from "./helper";
 import { $redis } from "../../tools/redis";
-import { infoLog } from "../../util/chalk";
 import { $mysql } from "../../tools/mysql";
 import { upSet } from "./redis";
 import { UpSql } from "../../tools/mysql/type";
 import { sleep } from "../../util";
 import { getListByUpdated } from "./mysql";
+import { scriptLog } from "../../tools/log4js/log";
 
 export const checkUp = async () => {
   const [err, storage] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct().find()
@@ -16,6 +16,7 @@ export const checkUp = async () => {
   const sqlSet = $redis.getSet(upSet('sql'))
   await storageSet.clear()
   await sqlSet.clear()
+  scriptLog(`check video storage: ${ storage.length },sql: ${ sql.length }`)
   await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String))
   await sqlSet.add(sql.map(i => i.mid + ''))
 }
@@ -26,7 +27,7 @@ export const upCreateTask = async () => {
   const fail = $redis.getSet(upSet('fail'))
   const [, list] = await storage.diff(upSet('sql'))
   const [, failList] = await fail.all();
-  infoLog(list.length + '个up主')
+  scriptLog(`new up task, length ${ list.length }`)
   await wait.add(list)
   await wait.del(failList)
   while (1) {
@@ -43,13 +44,12 @@ export const upCreateTask = async () => {
       break
     }
   }
-  const failTask = await fail.all()
-  console.log(failTask[1])
   taskBranch()
 }
 
 export const upUpdateTask = async () => {
   const [, up] = await getListByUpdated(10, 'ASC')
+  scriptLog(`start up update, length ${ up.length }`)
   if (up) {
     for (const mid of up.map(i => i.mid)) {
       await createdAndUpdated(+mid)

@@ -1,3 +1,4 @@
 import { upCreateTask } from "../../modules/up/task";
+import { scriptStart } from "../../tools/log4js/log";
 
-upCreateTask().then(() => process.exit(1))
+scriptStart(upCreateTask)
