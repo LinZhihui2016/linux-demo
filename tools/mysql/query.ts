@@ -63,7 +63,7 @@ export class Query<T> {
 
   limit(pageSize: number, page: number) {
     if (pageSize > 1 && page >= 0) {
-      this._limit = `${ page * pageSize },${ (page + 1) * pageSize }`
+      this._limit = `${ page * pageSize },${ pageSize }`
     }
     return this
   }
