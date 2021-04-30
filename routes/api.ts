@@ -24,8 +24,8 @@ export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.j
             res.status(status || 200).send({
               ...body,
               time: `${ time }ms`,
-              start: $date(start),
-              end: $date(end),
+              start: $date(start, 4),
+              end: $date(end, 4),
               status: !body.err
             })
           }
