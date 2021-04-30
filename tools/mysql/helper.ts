@@ -18,7 +18,7 @@ export const paging = async <T>(opt: {
 }): PRes<Paging<T>> => {
   const { table, page: { page, pageSize }, where = '', more = e => e, select = '*' } = opt
   let $pageSize = Math.max(toInt(pageSize, 30), 50)
-  if ($pageSize < 10) {
+  if ($pageSize <= 10) {
     $pageSize = 10
   }
   let $page = toInt(page, 1) - 1
