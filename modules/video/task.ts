@@ -4,6 +4,7 @@ import { videoSet } from "./redis";
 import { infoLog } from "../../util/chalk";
 import { createdAndUpdated } from "./helper";
 import { sleep } from "../../util";
+import { getListByUpdated } from "./mysql";
 
 export const checkVideo = async () => {
   const [err, storage] = await $mysql.query<{ LIST: string }>('video_rank').select('list').find()
@@ -43,4 +44,29 @@ export const videoCreateTask = async () => {
   }
   const failTask = await fail.all()
   console.log(failTask[1])
+  taskBranch()
+}
+
+
+export const videoUpdateTask = async () => {
+  const [, video] = await getListByUpdated(10, 'ASC')
+  if (video) {
+    for (const bvid of video.map(i => i.bvid)) {
+      await createdAndUpdated(bvid)
+    }
+  }
+  taskBranch()
+}
+
+export const taskBranch = () => {
+  setTimeout(async () => {
+    const storage = $redis.getSet(videoSet('storage'))
+    const [, list] = await storage.diff(videoSet('sql'))
+    if (list.length) {
+      await videoCreateTask()
+    } else {
+      await videoUpdateTask()
+    }
+  }, 1000 * 60 * 5)
+
 }

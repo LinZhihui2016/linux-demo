@@ -29,7 +29,6 @@ export const getListByBv = async <T = VideoSql>(list: string[], select: string |
   const [e, video] = await $mysql.query<T>(VIDEO_TABLE).select(select).where(where).orderBy('bvid', list).find();
   return e ? [e, null] : [null, video]
 }
-export const getListByUpdated = async (count: number, orderBy: 'ASC' | 'DESC'): PRes<VideoSql[]> => {
-  const [e, video] = await $mysql.query<VideoSql>(VIDEO_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
-  return e ? [e, null] : [null, video]
+export const getListByUpdated = async (count: number, orderBy: 'ASC' | 'DESC') => {
+  return $mysql.query<VideoSql>(VIDEO_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
 }

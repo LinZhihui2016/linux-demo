@@ -25,7 +25,6 @@ export const getListById = async <T = UpSql>(list: number[], select: string | st
   const [e, up] = await $mysql.query<T>(UP_TABLE).select(select).where(where).orderBy('id', list).find();
   return e ? [e, null] : [null, up]
 }
-export const getListByUpdated = async (count: number, orderBy: 'ASC' | 'DESC'): PRes<UpSql[]> => {
-  const [e, video] = await $mysql.query<UpSql>(UP_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
-  return e ? [e, null] : [null, video]
+export const getListByUpdated = (count: number, orderBy: 'ASC' | 'DESC') => {
+  return $mysql.query<UpSql>(UP_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
 }

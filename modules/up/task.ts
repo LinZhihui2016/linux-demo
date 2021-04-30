@@ -5,6 +5,7 @@ import { $mysql } from "../../tools/mysql";
 import { upSet } from "./redis";
 import { UpSql } from "../../tools/mysql/type";
 import { sleep } from "../../util";
+import { getListByUpdated } from "./mysql";
 
 export const checkUp = async () => {
   const [err, storage] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct().find()
@@ -44,4 +45,27 @@ export const upCreateTask = async () => {
   }
   const failTask = await fail.all()
   console.log(failTask[1])
+  taskBranch()
+}
+
+export const upUpdateTask = async () => {
+  const [, up] = await getListByUpdated(10, 'ASC')
+  if (up) {
+    for (const mid of up.map(i => i.mid)) {
+      await createdAndUpdated(+mid)
+    }
+  }
+  taskBranch()
+}
+
+export const taskBranch = () => {
+  setTimeout(async () => {
+    const storage = $redis.getSet(upSet('storage'))
+    const [, list] = await storage.diff(upSet('sql'))
+    if (list.length) {
+      await upCreateTask()
+    } else {
+      await upUpdateTask()
+    }
+  }, 1000 * 60 * 5)
 }
