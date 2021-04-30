@@ -68,7 +68,7 @@ export const upUpdateTask = async () => {
       const lock = await getTaskLock('up')
       if (lock) return
       await sleep(10000)
-      await createdAndUpdated(+mid)
+      await createdAndUpdated(+mid, true)
     }
   }
   await taskBranch()

@@ -56,7 +56,7 @@ export const videoUpdateTask = async () => {
     for (const bvid of video.map(i => i.bvid)) {
       const lock = await getTaskLock('video')
       if (lock) return
-      await createdAndUpdated(bvid)
+      await createdAndUpdated(bvid, true)
     }
   }
   await taskBranch()
