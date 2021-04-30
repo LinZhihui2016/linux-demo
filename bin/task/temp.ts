@@ -1,7 +1,8 @@
-import { rankDailyTask } from "../../modules/rank/task";
 import { scriptStart } from "../../helper";
+import { $redis } from "../../tools/redis";
 
 const temp = async () => {
-  await rankDailyTask()
+  const [a, b] = await $redis.getSet('a').add(['1'])
+  console.log(a, b)
 }
 scriptStart(temp)
