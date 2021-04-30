@@ -9,7 +9,7 @@ import { getTaskLock } from "../../tools/redis";
 
 export const upLogTask = async () => {
   const lock = await getTaskLock('up')
-  if (lock) return
+  if (lock) await sleep(1000 * 60 * 60 *2)
   const [, allList] = await getAllUpInFans();
   const date = dayjs().startOf('date').valueOf()
   if (allList && allList.length) {

@@ -33,7 +33,7 @@ export const videoCreateTask = async () => {
     const [, bv] = await wait.pop()
     if (bv) {
       const lock = await getTaskLock('video')
-      if (lock) return
+      if (lock) await sleep(1000 * 60 * 60 * 2)
       const [err2] = await createdAndUpdated(bv)
       if (err2) {
         await fail.add(bv)
@@ -56,7 +56,7 @@ export const videoUpdateTask = async () => {
   if (video) {
     for (const bvid of video.map(i => i.bvid)) {
       const lock = await getTaskLock('video')
-      if (lock) return
+      if (lock) await sleep(1000 * 60 * 60 * 2)
       await createdAndUpdated(bvid, true)
       await sleep(2000)
     }

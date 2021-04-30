@@ -9,7 +9,7 @@ import { getTaskLock } from "../../tools/redis";
 
 export const videoLogTask = async () => {
   const lock = await getTaskLock('video')
-  if (lock) return
+  if (lock) await sleep(1000 * 60 * 60 *2)
   const [, allList] = await getAllVideoInFans();
   const date = dayjs().startOf('date').valueOf()
   if (allList && allList.length) {

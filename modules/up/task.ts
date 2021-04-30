@@ -29,7 +29,6 @@ export const taskBranch = async () => {
   } else {
     await upUpdateTask()
   }
-
 }
 export const upCreateTask = async () => {
   const wait = $redis.getSet(upSet('wait'))
@@ -44,7 +43,7 @@ export const upCreateTask = async () => {
     const [, mid] = await wait.pop()
     if (mid) {
       const lock = await getTaskLock('up')
-      if (lock) return
+      if (lock) await sleep(1000 * 60 * 60 * 2)
       const [err2] = await createdAndUpdated(+mid)
       if (err2) {
         await fail.add(mid)
@@ -66,7 +65,7 @@ export const upUpdateTask = async () => {
   if (up) {
     for (const mid of up.map(i => i.mid)) {
       const lock = await getTaskLock('up')
-      if (lock) return
+      if (lock) await sleep(1000 * 60 * 60 * 2)
       await createdAndUpdated(+mid, true)
       await sleep(10000)
     }
