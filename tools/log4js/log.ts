@@ -12,27 +12,27 @@ export const logInit = () =>
         redis: { type: 'redis', filename: 'redis.log' },
       },
       categories: {
-        api2: { appenders: ['api'], level: 'info' },
+        api: { appenders: ['api'], level: 'info' },
         script: { appenders: ['script'], level: 'info' },
-        redis: { appenders: ['redis'], level: 'error' },
-        mysql: { appenders: ['mysql'], level: 'error' },
-        default: { appenders: ['error'], level: 'error' }
+        error: { appenders: ['error'], level: 'error' },
+        redis: { appenders: ['redis', 'error'], level: 'error' },
+        mysql: { appenders: ['mysql', 'error'], level: 'error' },
       }
     })
 
-const infoHelper = (categories: 'api2' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
+const infoHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
     log4js.getLogger(categories).info(JSON.stringify(msg))
-const errorHelper = (categories: 'api2' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
+const errorHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
     log4js.getLogger(categories).error(JSON.stringify(msg))
 
 export const errorLog = (msg: Type.Obj<any> | string) => {
   errorHelper('error', msg)
   return errorLog
 }
-export const api2Log = (msg: Type.Obj<any> | string) => {
-  infoHelper('api2', msg)
+export const apiLog = (msg: Type.Obj<any> | string) => {
+  infoHelper('api', msg)
   expressChalk(JSON.stringify(msg))
-  return api2Log
+  return apiLog
 }
 export const scriptLog = (msg: Type.Obj<any> | string) => {
   infoHelper('script', msg)
