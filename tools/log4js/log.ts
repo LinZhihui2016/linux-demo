@@ -10,10 +10,12 @@ export const logInit = () =>
         error: { type: 'dateFile', filename: 'log/error.log' },
         mysql: { type: 'dateFile', filename: 'log/mysql.log' },
         redis: { type: 'dateFile', filename: 'log/redis.log' },
+        lock: { type: 'file', filename: 'log/lock.log' }
       },
       categories: {
         api: { appenders: ['api'], level: 'info' },
         script: { appenders: ['script'], level: 'info' },
+        lock: { appenders: ['lock'], level: 'info' },
         error: { appenders: ['error'], level: 'error' },
         redis: { appenders: ['redis', 'error'], level: 'error' },
         mysql: { appenders: ['mysql', 'error'], level: 'error' },
@@ -21,11 +23,15 @@ export const logInit = () =>
       }
     })
 
-const infoHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
+const infoHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error' | 'lock', msg: Type.Obj<any> | string) =>
     log4js.getLogger(categories).info(JSON.stringify(msg))
-const errorHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error', msg: Type.Obj<any> | string) =>
+const errorHelper = (categories: 'api' | 'script' | 'mysql' | 'redis' | 'error' | 'lock', msg: Type.Obj<any> | string) =>
     log4js.getLogger(categories).error(JSON.stringify(msg))
 
+export const lockLog = (msg: Type.Obj<any> | string) => {
+  errorHelper('lock', msg)
+  return lockLog
+}
 export const errorLog = (msg: Type.Obj<any> | string) => {
   errorHelper('error', msg)
   return errorLog

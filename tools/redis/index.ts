@@ -5,7 +5,7 @@ import { RedisHash } from "./hash";
 import { RedisKey } from "./key";
 import redisConf from '../../conf/redis.json'
 import { RequestHandler } from "express";
-import { redisLog } from "../log4js/log";
+import { lockLog, redisLog } from "../log4js/log";
 import { infoChalk } from "../../util/chalk";
 import { EventEmitter } from "events";
 import { RedisSet } from "./set";
@@ -56,7 +56,10 @@ export const redisRes = <S, T extends CallableFunction>(resolve: T, fn?: (arg: S
 export const isOK = (reply: string) => reply === 'OK'
 export const is1 = (reply: string | number) => (reply + '') === '1'
 
-export const setTaskLock = (key: 'up' | 'video') => $redis.str.set({ [`task:lock:${ key }`]: '1' })
+export const setTaskLock = (key: 'up' | 'video') => {
+  lockLog(`lock by ${ key }`)
+  return $redis.str.set({ [`task:lock:${ key }`]: '1' })
+}
 export const removeTaskLock = (key: 'up' | 'video') => $redis.str.set({ [`task:lock:${ key }`]: '0' })
 export const getTaskLock = async (key: 'up' | 'video') => {
   const [, lock] = await $redis.str.get(`task:lock:${ key }`)
