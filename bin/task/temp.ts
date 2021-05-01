@@ -1,7 +1,7 @@
 import { scriptStart } from "../../helper";
-import { checkUp } from "../../modules/up/task";
+import { taskBranch } from "../../modules/video/task";
 
 const temp = async () => {
-  await checkUp()
+  await taskBranch()
 }
 scriptStart(temp)
