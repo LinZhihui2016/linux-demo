@@ -15,7 +15,7 @@ export const paging = async <T>(opt: {
   page: { pageSize?: string, page?: string }
   where?: Where | string
   more?: <S>(s: Query<S>) => Query<S>
-  select?: string
+  select?: string | string[]
 }): PRes<Paging<T>> => {
   const { table, page: { page, pageSize }, where = '', more = e => e, select = '*' } = opt
   let $pageSize = Math.min(toInt(pageSize, 30), 50)

@@ -37,21 +37,28 @@ export const unfansVideo = async (user_id: number, video_id: number): PRes<boole
   return [null, true]
 }
 
-export const fansVideoList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<VideoSql>> => {
+export const fansVideoList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<VideoSql & { isFans?: number, fans_time: number }>> => {
   const where = new Where().eq('user_id', user)
-  const [e, res] = await paging<{ VIDEO_ID: number }>({
+  const [e, fansUpIdList] = await paging<{ VIDEO_ID: number, FANS_TIME: number }>({
     table: VIDEO_FANS_TABLE,
-    select: 'video_id',
+    select: ['video_id', 'fans_time'],
     where,
     more: e => e.orderBy('fans_time', 'DESC'),
     page
   });
   if (e) return [e, null]
-  const list = res!.list
-  if (!list.length) return [null, { ...res!, list: [] }]
-  const [e2, videoList] = await getListById(list.map(i => i.VIDEO_ID))
+  const list = fansUpIdList!.list
+  const map = new Map<number, number>()
+  list.forEach(({ VIDEO_ID, FANS_TIME }) => map.set(VIDEO_ID, FANS_TIME))
+  if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
+  const [e2, videoList] = await getListById<VideoSql & { isFans?: number, fans_time: number }>(list.map(i => i.VIDEO_ID))
   if (e2) return [e2, null]
-  return [null, { ...res!, list: videoList! }]
+  videoList.forEach(video => ({
+    ...video,
+    isFans: 1,
+    fans_time: map.get(+video.id!)
+  }))
+  return [null, { ...fansUpIdList!, list: videoList }]
 }
 
 export const getAllVideoInFans = async (): PRes<number[]> => {

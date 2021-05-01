@@ -37,21 +37,28 @@ export const unfansUp = async (user_id: number, up_id: number): PRes<boolean, Re
   return [null, true]
 }
 
-export const fansUpList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<UpSql>> => {
+export const fansUpList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<UpSql & { isFans?: number, fans_time: number }>> => {
   const where = new Where().eq('user_id', user)
-  const [e, res] = await paging<{ UP_ID: number }>({
+  const [e, fansUpIdList] = await paging<{ UP_ID: number, FANS_TIME: number }>({
     table: UP_FANS_TABLE,
-    select: 'up_id',
+    select: ['up_id', 'fans_time'],
     where,
     more: e => e.orderBy('fans_time', 'DESC'),
     page
   });
   if (e) return [e, null]
-  const list = res!.list
-  if (!list.length) return [null, { ...res!, list: [] }]
-  const [e2, upList] = await getListById(list.map(i => i.UP_ID))
+  const list = fansUpIdList!.list
+  const map = new Map<number, number>()
+  list.forEach(({ UP_ID, FANS_TIME }) => map.set(UP_ID, FANS_TIME))
+  if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
+  const [e2, upList] = await getListById<UpSql & { isFans: number, fans_time: number }>(list.map(i => i.UP_ID))
   if (e2) return [e2, null]
-  return [null, { ...res!, list: upList! }]
+  upList.forEach(up => ({
+    ...up,
+    isFans: 1,
+    fans_time: map.get(+up.id!)
+  }))
+  return [null, { ...fansUpIdList!, list: upList }]
 }
 
 export const getAllUpInFans = async (): PRes<number[]> => {

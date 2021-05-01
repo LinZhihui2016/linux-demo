@@ -21,10 +21,9 @@ export const getVideo = async (bv: string): PRes<VideoSql> => {
   return [null, info[0]]
 }
 
-export const getListById = async <T = VideoSql>(list: number[], select: string | string[] = '*'): PRes<T[]> => {
+export const getListById = <T = VideoSql>(list: number[], select: string | string[] = '*') => {
   const where = new Where().in('id', list)
-  const [e, video] = await $mysql.query<T>(VIDEO_TABLE).select(select).where(where).orderBy('id', list).find();
-  return e ? [e, null] : [null, video]
+  return $mysql.query<T>(VIDEO_TABLE).select(select).where(where).orderBy('id', list).find();
 }
 export const getListByBv = async <T = VideoSql>(list: string[], select: string | string[] = '*'): PRes<T[]> => {
   const where = new Where().in('bvid', list)
