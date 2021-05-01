@@ -1,8 +1,7 @@
 import { scriptStart } from "../../helper";
-import { $redis } from "../../tools/redis";
+import { checkUp } from "../../modules/up/task";
 
 const temp = async () => {
-  const [a, b] = await $redis.getSet('a').add(['1'])
-  console.log(a, b)
+  await checkUp()
 }
 scriptStart(temp)

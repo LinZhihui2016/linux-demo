@@ -5,6 +5,7 @@ import { createdAndUpdated } from "./helper";
 import { sleep } from "../../util";
 import { getListByUpdated } from "./mysql";
 import { scriptLog } from "../../tools/log4js/log";
+import { upSet } from "../up/redis";
 
 export const checkVideo = async () => {
   const [err, storage] = await $mysql.query<{ LIST: string }>('video_rank').select('list').find()
@@ -69,7 +70,11 @@ export const taskBranch = async () => {
   if (new Date().getHours() >= 23) return;
   const storage = $redis.getSet(videoSet('storage'))
   const [, list] = await storage.diff(videoSet('sql'))
-  if (list.length) {
+  const fail = await $redis.getSet(upSet('fail')).all()
+  if (!fail[1]) {
+    await videoUpdateTask()
+  }
+  if (list.length - fail[1].length) {
     await videoCreateTask()
   } else {
     await videoUpdateTask()

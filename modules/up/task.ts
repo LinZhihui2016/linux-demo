@@ -16,7 +16,7 @@ export const checkUp = async () => {
   const sqlSet = $redis.getSet(upSet('sql'))
   await storageSet.clear()
   await sqlSet.clear()
-  scriptLog(`check video storage: ${ storage.length },sql: ${ sql.length }`)
+  scriptLog(`check up storage: ${ storage.length },sql: ${ sql.length }`)
   await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String))
   await sqlSet.add(sql.map(i => i.mid + ''))
 }
@@ -24,7 +24,11 @@ export const taskBranch = async () => {
   if (new Date().getHours() >= 23) return;
   const storage = $redis.getSet(upSet('storage'))
   const [, list] = await storage.diff(upSet('sql'))
-  if (list.length) {
+  const fail = await $redis.getSet(upSet('fail')).all()
+  if (!fail[1]) {
+    await upUpdateTask()
+  }
+  if (list.length - fail[1].length) {
     await upCreateTask()
   } else {
     await upUpdateTask()
