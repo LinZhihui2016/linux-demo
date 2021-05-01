@@ -7,6 +7,7 @@ import { UP_FANS_MAX } from "../../util/magic";
 import { Paging, paging } from "../../tools/mysql/helper";
 import { UpSql } from "../../tools/mysql/type";
 import { getListById } from "../up/mysql";
+import { $date } from "../../util/date";
 
 const UP_FANS_TABLE = 'up_fans'
 
@@ -37,7 +38,7 @@ export const unfansUp = async (user_id: number, up_id: number): PRes<boolean, Re
   return [null, true]
 }
 
-export const fansUpList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<UpSql & { isFans?: number, fans_time: number }>> => {
+export const fansUpList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<UpSql & { isFans?: number, fans_time: string }>> => {
   const where = new Where().eq('user_id', user)
   const [e, fansUpIdList] = await paging<{ UP_ID: number, FANS_TIME: number }>({
     table: UP_FANS_TABLE,
@@ -51,11 +52,14 @@ export const fansUpList = async (user: number, page: { page?: string, pageSize?:
   const map = new Map<number, number>()
   list.forEach(({ UP_ID, FANS_TIME }) => map.set(UP_ID, FANS_TIME))
   if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
-  const [e2, upList] = await getListById<UpSql & { isFans: number, fans_time: number }>(list.map(i => i.UP_ID))
+  const [e2, upList] = await getListById<UpSql & { isFans: number, fans_time: string }>(list.map(i => i.UP_ID))
   if (e2) return [e2, null]
   upList.forEach(up => {
     up.isFans = 1
-    up.fans_time = map.get(+up.id!) || 0
+    const time = map.get(+up.id!)
+    if (time) {
+      up.fans_time = $date(time, 4) || ''
+    }
   })
   return [null, { ...fansUpIdList!, list: upList }]
 }

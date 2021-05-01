@@ -7,6 +7,7 @@ import { VIDEO_FANS_MAX } from "../../util/magic";
 import { Paging, paging } from "../../tools/mysql/helper";
 import { getListById } from "../video/mysql";
 import { VideoSql } from "../../tools/mysql/type";
+import { $date } from "../../util/date";
 
 const VIDEO_FANS_TABLE = 'video_fans'
 
@@ -37,7 +38,7 @@ export const unfansVideo = async (user_id: number, video_id: number): PRes<boole
   return [null, true]
 }
 
-export const fansVideoList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<VideoSql & { isFans?: number, fans_time: number }>> => {
+export const fansVideoList = async (user: number, page: { page?: string, pageSize?: string }): PRes<Paging<VideoSql & { isFans?: number, fans_time: string }>> => {
   const where = new Where().eq('user_id', user)
   const [e, fansUpIdList] = await paging<{ VIDEO_ID: number, FANS_TIME: number }>({
     table: VIDEO_FANS_TABLE,
@@ -51,11 +52,14 @@ export const fansVideoList = async (user: number, page: { page?: string, pageSiz
   const map = new Map<number, number>()
   list.forEach(({ VIDEO_ID, FANS_TIME }) => map.set(VIDEO_ID, FANS_TIME))
   if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
-  const [e2, videoList] = await getListById<VideoSql & { isFans?: number, fans_time: number }>(list.map(i => i.VIDEO_ID))
+  const [e2, videoList] = await getListById<VideoSql & { isFans?: number, fans_time: string }>(list.map(i => i.VIDEO_ID))
   if (e2) return [e2, null]
   videoList.forEach(video => {
     video.isFans = 1
-    video.fans_time = map.get(+video.id!) || 0
+    const time = map.get(+video.id!)
+    if (time) {
+      video.fans_time = $date(time, 4) || ''
+    }
   })
   return [null, { ...fansUpIdList!, list: videoList }]
 }
