@@ -43,7 +43,8 @@ export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Pa
   const [err, pagingList] = await paging<VideoSql>({
     table: VIDEO_TABLE,
     page: { pageSize, page },
-    more: e => sort ? e.orderBy(sort, orderby) : e
+    more: e => sort ? e.orderBy(sort, orderby) : e,
+    where: new Where().notEq('type', 'deleted')
   })
   if (err) return [err, null]
   const list: (VideoSql & { isFans: number })[] = pagingList!.list.map(i => ({ ...i, isFans: 0 }))
