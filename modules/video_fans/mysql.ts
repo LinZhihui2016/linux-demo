@@ -53,11 +53,10 @@ export const fansVideoList = async (user: number, page: { page?: string, pageSiz
   if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
   const [e2, videoList] = await getListById<VideoSql & { isFans?: number, fans_time: number }>(list.map(i => i.VIDEO_ID))
   if (e2) return [e2, null]
-  videoList.forEach(video => ({
-    ...video,
-    isFans: 1,
-    fans_time: map.get(+video.id!)
-  }))
+  videoList.forEach(video => {
+    video.isFans = 1
+    video.fans_time = map.get(+video.id!) || 0
+  })
   return [null, { ...fansUpIdList!, list: videoList }]
 }
 

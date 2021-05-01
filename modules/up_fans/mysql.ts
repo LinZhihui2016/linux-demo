@@ -53,11 +53,10 @@ export const fansUpList = async (user: number, page: { page?: string, pageSize?:
   if (!list.length) return [null, { ...fansUpIdList!, list: [] }]
   const [e2, upList] = await getListById<UpSql & { isFans: number, fans_time: number }>(list.map(i => i.UP_ID))
   if (e2) return [e2, null]
-  upList.forEach(up => ({
-    ...up,
-    isFans: 1,
-    fans_time: map.get(+up.id!)
-  }))
+  upList.forEach(up => {
+    up.isFans = 1
+    up.fans_time = map.get(+up.id!) || 0
+  })
   return [null, { ...fansUpIdList!, list: upList }]
 }
 
