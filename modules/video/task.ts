@@ -16,7 +16,7 @@ export const checkVideo = async () => {
   await storageSet.clear()
   await sqlSet.clear()
   scriptLog(`check video storage: ${ storage.length },sql: ${ sql.length }`)
-  await storageSet.add(storage.map(i => i.LIST.split(',')).reduce((a, b) => a.concat(b), []))
+  await storageSet.add(storage.map(i => i.LIST.split(',')).reduce((a, b) => a.concat(b), []).concat(sql.map(i => i.BVID)))
   await sqlSet.add(sql.map(i => i.BVID))
 }
 

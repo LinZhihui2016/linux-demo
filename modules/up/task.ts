@@ -17,7 +17,7 @@ export const checkUp = async () => {
   await storageSet.clear()
   await sqlSet.clear()
   scriptLog(`check up storage: ${ storage.length },sql: ${ sql.length }`)
-  await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String))
+  await storageSet.add(storage.map(i => i.UP_MID).filter(Boolean).map(String).concat(sql.map(i => i.mid + '')))
   await sqlSet.add(sql.map(i => i.mid + ''))
 }
 export const taskBranch = async () => {
