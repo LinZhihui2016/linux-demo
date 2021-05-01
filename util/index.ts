@@ -49,7 +49,7 @@ export const toInt = (s?: string, init = 0) => {
 
 export const setArr = <T>(arr: T[]): T[] =>
     Array.from(new Set(arr))
-
+export const notInArr = <T>(arr: T[], key: T, init?: T) => arr.includes(key) ? key : init || arr[0]
 
 export const MINUTE = 60
 export const HOUR = MINUTE * 60

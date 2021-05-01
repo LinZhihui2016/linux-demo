@@ -1,11 +1,13 @@
 import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrUp } from "../../util/error";
-import { getListByUpdated, getUp } from "./mysql";
+import { getListBySort, getListByUpdated, getUp } from "./mysql";
 import { fansUp, fansUpList, unfansUp } from "../up_fans/mysql";
 import { upSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
 import { videoSet } from "../video/redis";
+import { ListQuery } from "../../tools/mysql/type";
+import { notInArr } from "../../util";
 
 export const postAdd: Action<{ mid: number }> = async ({ mid }) => {
   const [err] = await upSetAdd(mid + '', 'storage')
@@ -23,7 +25,7 @@ export const getInfo: Action<{ mid: number }> = async ({ mid }) => {
   return success(res)
 }
 
-export const postFans: Action<{ id: number, status?: boolean }> = async ({ id, status, user }) => {
+export const postFans: Action<{ id: number, status?: 0 | 1 }> = async ({ id, status, user }) => {
   if (!id) return error(ErrBase.参数错误)
   if (!user) return error(ErrBase.参数错误)
   const [err] = status ? await fansUp(user, id) : await unfansUp(user, id)
@@ -38,5 +40,13 @@ export const getFansList: Action<{ page?: string, pageSize?: string }> = async (
 
 export const getLatest: Action<{ count: number }> = async ({ count }) => {
   const [err, list] = await getListByUpdated(count || 10, 'DESC')
+  return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
+}
+
+export const getList: Action<ListQuery & { fans: number }> = async (query) => {
+  const sortArr = ['follower', 'archive', 'likes', 'updated', 'created']
+  query.sort = notInArr(sortArr, query.sort)
+  query.orderby = notInArr(['DESC', 'ASC'], query.orderby)
+  const [err, list] = await getListBySort(query, true)
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }

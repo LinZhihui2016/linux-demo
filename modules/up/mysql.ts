@@ -1,7 +1,9 @@
 import { PRes } from "../../type";
-import { UpSql } from "../../tools/mysql/type";
+import { ListQuery, UpSql } from "../../tools/mysql/type";
 import { Where } from "../../tools/mysql/where";
 import { $mysql } from "../../tools/mysql";
+import { Paging, paging } from "../../tools/mysql/helper";
+import { getAllUpInFans } from "../up_fans/mysql";
 
 const UP_TABLE = 'up'
 
@@ -26,4 +28,28 @@ export const getListById = async <T = UpSql>(list: number[], select: string | st
 }
 export const getListByUpdated = (count: number, orderBy: 'ASC' | 'DESC') => {
   return $mysql.query<UpSql>(UP_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
+}
+
+export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Paging<UpSql & { isFans?: number }>> => {
+  const {
+    page,
+    pageSize,
+    orderby,
+    sort
+  } = query
+  const [err, pagingList] = await paging<UpSql>({
+    table: UP_TABLE,
+    page: { pageSize, page },
+    more: e => sort ? e.orderBy(sort, orderby) : e
+  })
+  if (err) return [err, null]
+  const list: (UpSql & { isFans: number })[] = pagingList!.list.map(i => ({ ...i, isFans: 0 }))
+  if (!getFans) return [null, pagingList!]
+  const res: Paging<UpSql & { isFans: number }> = { list, total: pagingList!.total, totalPage: pagingList!.totalPage }
+  const [e, fansList] = await getAllUpInFans()
+  if (e) return [null, res]
+  res.list.forEach(i => {
+    i.isFans = +fansList!.includes(i.id as number)
+  })
+  return [null, res]
 }

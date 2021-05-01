@@ -6,6 +6,7 @@ import { PRes } from "../../type";
 
 export interface Paging<T> {
   totalPage: number,
+  total: number,
   list: T[]
 }
 
@@ -30,5 +31,5 @@ export const paging = async <T>(opt: {
   if (e1) return [e1, null]
   if (e2) return [e2, null]
   const totalPage = Math.ceil(total[0].len / $pageSize)
-  return [null, { totalPage, list }]
+  return [null, { totalPage, list, total: total[0].len }]
 }

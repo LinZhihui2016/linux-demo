@@ -1,7 +1,9 @@
-import { VideoSql } from "../../tools/mysql/type";
+import { ListQuery, VideoSql } from "../../tools/mysql/type";
 import { Where } from "../../tools/mysql/where";
 import { $mysql } from "../../tools/mysql";
 import { PRes } from "../../type";
+import { paging, Paging } from "../../tools/mysql/helper";
+import { getAllVideoInFans } from "../video_fans/mysql";
 
 const VIDEO_TABLE = 'video'
 export const saveVideo = async (video: VideoSql) => {
@@ -31,4 +33,31 @@ export const getListByBv = async <T = VideoSql>(list: string[], select: string |
 }
 export const getListByUpdated = async (count: number, orderBy: 'ASC' | 'DESC') => {
   return $mysql.query<VideoSql>(VIDEO_TABLE).orderBy('updated', orderBy).limit(Math.max(count, 30), 0).find();
+}
+export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Paging<VideoSql & { isFans?: number }>> => {
+  const {
+    page,
+    pageSize,
+    orderby,
+    sort
+  } = query
+  const [err, pagingList] = await paging<VideoSql>({
+    table: VIDEO_TABLE,
+    page: { pageSize, page },
+    more: e => sort ? e.orderBy(sort, orderby) : e
+  })
+  if (err) return [err, null]
+  const list: (VideoSql & { isFans: number })[] = pagingList!.list.map(i => ({ ...i, isFans: 0 }))
+  if (!getFans) return [null, pagingList!]
+  const res: Paging<VideoSql & { isFans: number }> = {
+    list,
+    total: pagingList!.total,
+    totalPage: pagingList!.totalPage
+  }
+  const [e, fansList] = await getAllVideoInFans()
+  if (e) return [null, res]
+  res.list.forEach(i => {
+    i.isFans = +fansList!.includes(i.id as number)
+  })
+  return [null, res]
 }

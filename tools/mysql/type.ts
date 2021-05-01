@@ -1,6 +1,13 @@
 import { Type } from "../../type";
 import { RankId } from "../../crawler/ranking";
 
+export interface ListQuery {
+  page?: string,
+  pageSize?: string,
+  orderby?: 'ASC' | 'DESC',
+  sort?: string
+}
+
 export interface VideoSqlBase extends Type.Obj {
   bvid: string,
 }
@@ -58,7 +65,6 @@ export interface UpSql extends Type.Obj {
   follower: number,
   archive: number,
   likes: number,
-  isFans?: 0 | 1,
   id?: number
   updated?: string
   created?: string
