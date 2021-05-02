@@ -57,3 +57,7 @@ export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Pa
 export const getChartList = async (orderBy: string) => {
   return $mysql.query(UP_TABLE).limit(10, 0).orderBy(orderBy, 'DESC').find()
 }
+
+export const getUpCount = async (where?: Where) => {
+  return $mysql.query<{ len: number }>(UP_TABLE).where(where || '').count().find()
+}

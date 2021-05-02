@@ -29,3 +29,7 @@ export const getTodayList = async (): PRes<string[][]> => {
   const [err, info] = await $mysql.query<{ LIST: string }>(VIDEO_RANK_TABLE).select('list').where(new Where().eq('date', date)).find()
   return err ? [err, null] : [null, info.map(i => i.LIST.split(','))]
 }
+
+export const getRankDateLength = () => {
+  return $mysql.query<{ len: number }>(VIDEO_RANK_TABLE).select('date').count().find()
+}

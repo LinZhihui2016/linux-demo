@@ -65,3 +65,8 @@ export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Pa
 export const getChartList = async (orderBy: string) => {
   return $mysql.query(VIDEO_TABLE).limit(10, 0).orderBy(orderBy, 'DESC').find()
 }
+export const getVideoCount = async (where?: Where) => {
+  const $where = where || new Where()
+  $where.notEq('type', 'deleted')
+  return $mysql.query<{ len: number }>(VIDEO_TABLE).where($where).count().find()
+}
