@@ -8,9 +8,9 @@ import { getListByUpdated } from "./mysql";
 import { scriptLog } from "../../tools/log4js/log";
 
 export const checkUp = async () => {
-  const [err, storage] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct().find()
+  const [err, storage] = await $mysql.query<{ UP_MID: number }>('video').select('up_mid').distinct(true).find()
   if (err) return
-  const [err2, sql] = await $mysql.query<UpSql>('up').distinct().find()
+  const [err2, sql] = await $mysql.query<UpSql>('up').find()
   if (err2) return
   const storageSet = $redis.getSet(upSet('storage'))
   const sqlSet = $redis.getSet(upSet('sql'))

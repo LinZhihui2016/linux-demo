@@ -45,8 +45,8 @@ export class Query<T> {
     return [$select, $from, $where, $orderBy, $limit].filter(Boolean).join(' ')
   }
 
-  distinct(flag?: boolean) {
-    this._distinct = !!flag
+  distinct(flag: boolean = true) {
+    this._distinct = flag
     return this
   }
 
