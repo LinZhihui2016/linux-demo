@@ -1,7 +1,8 @@
 import { scriptStart } from "../../helper";
-import { taskBranch } from "../../modules/video/task";
+import { getRankDateLength } from "../../modules/rank/mysql";
 
 const temp = async () => {
-  await taskBranch()
+  const a = await getRankDateLength()
+  console.log(a)
 }
 scriptStart(temp)

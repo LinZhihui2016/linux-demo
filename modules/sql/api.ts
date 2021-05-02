@@ -20,7 +20,7 @@ export const getCount: Action = async ({ user }) => {
     const obj = {
       up: { total: upCount[0].len, fans: upFansCount },
       video: { total: videoCount[0].len, fans: videoFansCount },
-      rank: { date: rankLength[0].len }
+      rank: { date: rankLength.length }
     }
     return success(obj)
   } catch (e) {
