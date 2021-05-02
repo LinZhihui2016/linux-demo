@@ -33,5 +33,5 @@ export const getRankDateLength = () => {
 }
 
 export const getRankRatioByDate = (date: string) => {
-  return $mysql.query<{ RID: RankId, count_in_0: number }>(VIDEO_RANK_TABLE).select(['rid', 'count_in_0']).where(new Where().eq('date', date)).find()
+  return $mysql.query<{ RID: RankId, COUNT_IN_0: number }>(VIDEO_RANK_TABLE).select(['rid', 'count_in_0']).where(new Where().eq('date', date)).find()
 }
