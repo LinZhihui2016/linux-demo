@@ -1,14 +1,13 @@
 import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrUp } from "../../util/error";
-import { getListBySort, getListByUpdated, getUp } from "./mysql";
+import { getChartList, getListBySort, getListByUpdated, getUp } from "./mysql";
 import { fansUp, fansUpList, unfansUp } from "../up_fans/mysql";
 import { upSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
 import { videoSet } from "../video/redis";
 import { ListQuery } from "../../tools/mysql/type";
 import { notInArr } from "../../util";
-import { getChartList } from "../video/mysql";
 
 export const postAdd: Action<{ mid: number }> = async ({ mid }) => {
   const [err] = await upSetAdd(mid + '', 'storage')
