@@ -76,7 +76,7 @@ export class Query<T> {
 
   orderBy(key: string, by: 'ASC' | "DESC" | any[] = 'ASC') {
     if (Array.isArray(by)) {
-      this._orderBy.push(`FIELD(${ key },${ by.join(',') })`)
+      this._orderBy.push(`FIELD(${ key },${ by.map(i => this.connection.escape(i)).join(',') })`)
     } else {
       this._orderBy.push([key, by].join(' '))
     }

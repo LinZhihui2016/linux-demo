@@ -37,6 +37,7 @@ export const getPaging: Action<{ rid: RankId, date: string }> = async ({ rid, da
   if (err) return error(ErrBase.mysql读取失败, err.message)
   const bvs = list!.split(',')
   const [err2, bvList] = await getListByBv(bvs)
+  console.log(err2)
   const rankList = bvs.map(bv => bvList!.find(i => i.bvid === bv) || bv)
   return err2 ? error(ErrRank.获取排行榜失败, err2.message) : success(rankList)
 }
