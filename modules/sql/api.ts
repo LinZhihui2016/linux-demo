@@ -6,6 +6,7 @@ import { getVideoFansLength } from "../video_fans/mysql";
 import { getRankDateLength } from "../rank/mysql";
 import { error, success } from "../../helper";
 import { ErrBase } from "../../util/error";
+import { UP_FANS_MAX, VIDEO_FANS_MAX } from "../../util/magic";
 
 export const getCount: Action = async ({ user }) => {
   const [err, upCount] = await getUpCount()
@@ -18,8 +19,8 @@ export const getCount: Action = async ({ user }) => {
   }
   try {
     const obj = {
-      up: { total: upCount[0].len, fans: upFansCount },
-      video: { total: videoCount[0].len, fans: videoFansCount },
+      up: { total: upCount[0].len, fans: upFansCount, fansMax: UP_FANS_MAX },
+      video: { total: videoCount[0].len, fans: videoFansCount, fansMax: VIDEO_FANS_MAX },
       rank: { date: rankLength.length }
     }
     return success(obj)
