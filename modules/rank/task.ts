@@ -2,6 +2,8 @@ import { RankId } from "../../crawler/ranking";
 import { PRes } from "../../type";
 import { postUpdate } from "./api";
 import { sleep } from "../../util";
+import { getListByDate } from "./mysql";
+import { countRank } from "./helper";
 
 const helper = async (rid: RankId, retry = 0): PRes<string> => {
   const res = await postUpdate({ noCache: false, rid: rid as unknown as RankId })
@@ -19,4 +21,9 @@ export const rankDailyTask = async () => {
     await sleep(2000)
     await helper(rid as unknown as RankId)
   }
+  const [err, list] = await getListByDate()
+  if (err) {
+    return
+  }
+  await countRank(list)
 }

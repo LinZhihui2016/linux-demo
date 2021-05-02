@@ -3,10 +3,10 @@ import { $mysql } from "../../tools/mysql";
 import { RankId } from "../../crawler/ranking";
 import { $date } from "../../util/date";
 import { PRes, Type } from "../../type";
+import { RankSql } from "../../tools/mysql/type";
 
 const VIDEO_RANK_TABLE = 'video_rank'
-export const saveRank = async (list: string[], rid: RankId) => {
-  const date = $date(new Date())
+export const saveRank = async (list: string[], rid: RankId, date: string) => {
   const where = new Where().eq('date', date).eq('rid', rid)
   const [err, ids] = await $mysql.query(VIDEO_RANK_TABLE).select('id').where(where).find()
   if (err) return [err, null]
@@ -24,12 +24,14 @@ export const getRank = async (rid: RankId, date: string): PRes<string> => {
   return [null, list[0].LIST]
 }
 
-export const getTodayList = async (): PRes<string[][]> => {
-  const date = $date(new Date())
-  const [err, info] = await $mysql.query<{ LIST: string }>(VIDEO_RANK_TABLE).select('list').where(new Where().eq('date', date)).find()
-  return err ? [err, null] : [null, info.map(i => i.LIST.split(','))]
+export const getListByDate = (date = $date(new Date())) => {
+  return $mysql.query<RankSql>(VIDEO_RANK_TABLE).where(new Where().eq('date', date)).find()
 }
 
 export const getRankDateLength = () => {
   return $mysql.query<{ len: number }>(VIDEO_RANK_TABLE).select('date').distinct(true).find()
+}
+
+export const getRankRatioByDate = (date: string) => {
+  return $mysql.query<{ RID: RankId, count_in_0: number }>(VIDEO_RANK_TABLE).select(['rid', 'count_in_0']).where(new Where().eq('date', date)).find()
 }

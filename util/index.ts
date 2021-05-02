@@ -12,7 +12,7 @@ export const arrayExclude = <T>(target: T[], exclude: T[]): T[] => {
 export const isArr = <T>(arr: T | T[]): T[] => Array.isArray(arr) ? arr : [arr]
 
 export const today = () => new Date().toLocaleDateString()
-
+export const yesterday = () => dayjs().subtract(1, "day").format('YYYY-MM-DD')
 export const sleep = (ms: number) => {
   sleepChalk(ms)
   return new Promise<void>(resolve => setTimeout(() => resolve(), ms))

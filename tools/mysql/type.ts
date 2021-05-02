@@ -55,6 +55,7 @@ export interface RankSql extends Type.Obj {
   date: string
   list: string
   ups: string
+  count_in_0: number
 }
 
 export interface UpSql extends Type.Obj {
