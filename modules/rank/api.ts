@@ -6,6 +6,7 @@ import { getRankCache, setRankCache } from "./redis";
 import { fetchRank } from "./fetch";
 import { getRank, saveRank } from "./mysql";
 import { getListByBv } from "../video/mysql";
+import { toInt } from "../../util";
 
 export const postUpdate: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
   if (!rid) return error(ErrBase.参数错误)
@@ -32,10 +33,10 @@ export const getRid: Action = () => {
   return Promise.resolve(success(rankObj))
 }
 
-export const getPaging: Action<{ rid: RankId, date: string }> = async ({ rid, date }) => {
+export const getPaging: Action<{ rid: RankId, date: string, count?: string }> = async ({ rid, date, count }) => {
   const [err, list] = await getRank(rid, date)
   if (err) return error(ErrBase.mysql读取失败, err.message)
-  const bvs = list!.split(',')
+  const bvs = list!.split(',').slice(0, toInt(count, 10))
   const [err2, bvList] = await getListByBv(bvs)
   const rankList = bvs.map(bv => bvList!.find(i => i.bvid === bv) || bv)
   return err2 ? error(ErrRank.获取排行榜失败, err2.message) : success(rankList)
