@@ -31,5 +31,5 @@ export const getTodayList = async (): PRes<string[][]> => {
 }
 
 export const getRankDateLength = () => {
-  return $mysql.query<{ len: number }>(VIDEO_RANK_TABLE).select('date').count().find()
+  return $mysql.query<{ len: number }>(VIDEO_RANK_TABLE).select('date').distinct().count().find()
 }
