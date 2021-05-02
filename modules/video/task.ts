@@ -19,7 +19,20 @@ export const checkVideo = async () => {
   await storageSet.add(storage.map(i => i.LIST.split(',')).reduce((a, b) => a.concat(b), []).concat(sql.map(i => i.BVID)))
   await sqlSet.add(sql.map(i => i.BVID))
 }
-
+export const taskBranch = async () => {
+  if (new Date().getHours() >= 23) return;
+  const storage = $redis.getSet(videoSet('storage'))
+  const [, list] = await storage.diff(videoSet('sql'))
+  const fail = await $redis.getSet(videoSet('fail')).all()
+  if (!fail[1]) {
+    return await videoUpdateTask()
+  }
+  if (list.length - fail[1].length) {
+    await videoCreateTask()
+  } else {
+    await videoUpdateTask()
+  }
+}
 export const videoCreateTask = async () => {
   const wait = $redis.getSet(videoSet('wait'))
   const storage = $redis.getSet(videoSet('storage'))
@@ -65,17 +78,3 @@ export const videoUpdateTask = async () => {
   await taskBranch()
 }
 
-export const taskBranch = async () => {
-  if (new Date().getHours() >= 23) return;
-  const storage = $redis.getSet(videoSet('storage'))
-  const [, list] = await storage.diff(videoSet('sql'))
-  const fail = await $redis.getSet(videoSet('fail')).all()
-  if (!fail[1]) {
-    await videoUpdateTask()
-  }
-  if (list.length - fail[1].length) {
-    await videoCreateTask()
-  } else {
-    await videoUpdateTask()
-  }
-}

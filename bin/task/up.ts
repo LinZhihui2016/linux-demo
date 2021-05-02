@@ -1,4 +1,4 @@
-import { upCreateTask } from "../../modules/up/task";
+import { taskBranch } from "../../modules/up/task";
 import { scriptStart } from "../../helper";
 
-scriptStart(upCreateTask)
+scriptStart(taskBranch)

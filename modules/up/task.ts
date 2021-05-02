@@ -26,7 +26,7 @@ export const taskBranch = async () => {
   const [, list] = await storage.diff(upSet('sql'))
   const fail = await $redis.getSet(upSet('fail')).all()
   if (!fail[1]) {
-    await upUpdateTask()
+    return await upUpdateTask()
   }
   if (list.length - fail[1].length) {
     await upCreateTask()
@@ -40,9 +40,9 @@ export const upCreateTask = async () => {
   const fail = $redis.getSet(upSet('fail'))
   const [, list] = await storage.diff(upSet('sql'))
   const [, failList] = await fail.all();
-  scriptLog(`new up task, length ${ list.length }`)
   list.length && await wait.add(list)
   failList.length && await wait.del(failList)
+  scriptLog(`new up task, length ${ list.length }`)
   while (1) {
     const [, mid] = await wait.pop()
     if (mid) {
