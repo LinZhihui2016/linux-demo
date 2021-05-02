@@ -1,7 +1,7 @@
 import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrVideo } from "../../util/error";
-import { getListBySort, getListByUpdated, getVideo } from "./mysql";
+import { getChartList, getListBySort, getListByUpdated, getVideo } from "./mysql";
 import { fansVideo, fansVideoList, unfansVideo } from "../video_fans/mysql";
 import { videoSet, videoSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
@@ -47,5 +47,11 @@ export const getList: Action<ListQuery & { fans: number }> = async (query) => {
   query.sort = notInArr(sortArr, query.sort)
   query.orderby = notInArr(['DESC', 'ASC'], query.orderby)
   const [err, list] = await getListBySort(query, true)
+  return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
+}
+
+export const getChart: Action<{ key: string }> = async ({ key }) => {
+  const sortArr = ['view', 'coin', 'like', 'reply', 'danmaku']
+  const [err, list] = await getChartList(notInArr(sortArr, key))
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }

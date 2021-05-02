@@ -61,3 +61,7 @@ export const getListBySort = async (query: ListQuery, getFans: boolean): PRes<Pa
   })
   return [null, res]
 }
+
+export const getChartList = async (orderBy: string) => {
+  return $mysql.query(VIDEO_TABLE).select([orderBy, 'bvid']).limit(10, 1).orderBy(orderBy, 'DESC').find()
+}

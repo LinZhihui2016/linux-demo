@@ -8,6 +8,7 @@ import { $redis } from "../../tools/redis";
 import { videoSet } from "../video/redis";
 import { ListQuery } from "../../tools/mysql/type";
 import { notInArr } from "../../util";
+import { getChartList } from "../video/mysql";
 
 export const postAdd: Action<{ mid: number }> = async ({ mid }) => {
   const [err] = await upSetAdd(mid + '', 'storage')
@@ -48,5 +49,11 @@ export const getList: Action<ListQuery & { fans: number }> = async (query) => {
   query.sort = notInArr(sortArr, query.sort)
   query.orderby = notInArr(['DESC', 'ASC'], query.orderby)
   const [err, list] = await getListBySort(query, true)
+  return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
+}
+
+export const getChart: Action<{ key: string }> = async ({ key }) => {
+  const sortArr = ['follower', 'archive', 'likes']
+  const [err, list] = await getChartList(notInArr(sortArr, key))
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }
