@@ -48,7 +48,7 @@ export const getRatio: Action<{ date?: string }> = async ({ date }) => {
   const $date = date || yesterday()
   const [err, data] = await getRankRatioByDate($date)
   if (err) return error(ErrRank.获取排行榜失败, err.sql)
-  const $data = data.filter(i => i.RID !== RankId.全站).map(i => {
+  const $data = data.filter(i => +i.RID !== +RankId.全站).map(i => {
     return { value: i.COUNT_IN_0, label: RankId[i.RID] }
   })
   return success($data)
