@@ -55,8 +55,9 @@ export class Query<T> {
     return this
   }
 
-  select(k: string | string[]) {
-    const _select = ((Array.isArray(k) ? k : [k]).join(',')).toUpperCase()
+  select(k: string | (string | [string, string])[]) {
+    const _k = (Array.isArray(k) ? k : [k]).map(i => Array.isArray(i) ? i.join(' as ') : i)
+    const _select = _k.join(',').toUpperCase()
     this._select = _select || '*'
     return this
   }
