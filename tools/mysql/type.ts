@@ -16,11 +16,11 @@ export interface VideoSqlBase_ extends VideoSqlBase {
   aid: number,
   title: string,
   pic: string,
-  view: number,
+  views: number,
   danmaku: number
   reply: number,
   coin: number,
-  like: number
+  likes: number
   up_mid: number,
   up_name: string
   updated?: string
@@ -74,11 +74,11 @@ export interface VideoLogSql extends Type.Obj {
   updated?: string
   created?: string
   id?: number
-  view: number,
+  views: number,
   danmaku: number
   reply: number,
   coin: number,
-  like: number
+  likes: number
   video_id: number
   date: number
 }

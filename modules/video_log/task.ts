@@ -9,7 +9,7 @@ import { getTaskLock } from "../../tools/redis";
 
 export const videoLogTask = async () => {
   const lock = await getTaskLock('video')
-  if (lock) await sleep(1000 * 60 * 60 *2)
+  if (lock) await sleep(1000 * 60 * 60 * 2)
   const [, allList] = await getAllVideoInFans();
   const date = dayjs().startOf('date').valueOf()
   if (allList && allList.length) {
@@ -20,8 +20,8 @@ export const videoLogTask = async () => {
       const { ID, BVID } = item
       const [, data] = await createdAndUpdated(BVID, true)
       if (data) {
-        const { view, danmaku, reply, like, coin } = data as VideoSqlBase_
-        const log: VideoLogSql = { view, danmaku, reply, like, coin, video_id: ID, date }
+        const { views, danmaku, reply, likes, coin } = data as VideoSqlBase_
+        const log: VideoLogSql = { views, danmaku, reply, likes, coin, video_id: ID, date }
         await saveVideoLog(log)
       }
     }

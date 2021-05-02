@@ -43,7 +43,7 @@ export const getLatest: Action<{ count: number }> = async ({ count }) => {
 }
 
 export const getList: Action<ListQuery & { fans: number }> = async (query) => {
-  const sortArr = ['view', 'coin', 'like', 'reply', 'danmaku', 'updated', 'created']
+  const sortArr = ['views', 'coin', 'likes', 'reply', 'danmaku', 'updated', 'created']
   query.sort = notInArr(sortArr, query.sort)
   query.orderby = notInArr(['DESC', 'ASC'], query.orderby)
   const [err, list] = await getListBySort(query, true)
@@ -51,7 +51,7 @@ export const getList: Action<ListQuery & { fans: number }> = async (query) => {
 }
 
 export const getChart: Action<{ key: string }> = async ({ key }) => {
-  const sortArr = ['view', 'coin', 'like', 'reply', 'danmaku']
+  const sortArr = ['views', 'coin', 'likes', 'reply', 'danmaku']
   const [err, list] = await getChartList(notInArr(sortArr, key))
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }

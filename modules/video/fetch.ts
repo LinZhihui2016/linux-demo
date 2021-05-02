@@ -27,8 +27,8 @@ export const fetchVideo = async (bv: string): PRes<VideoSql> => {
     } = json
     const normalBv: NormalVideoSql = {
       up_mid: +mid, up_name: name, bvid,
-      aid, title, pic, pubdate, desc, view, danmaku,
-      reply, favorite, coin, share, like, type: 'normal'
+      aid, title, pic, pubdate, desc, views: view, danmaku,
+      reply, favorite, coin, share, likes: like, type: 'normal'
     }
     await postAdd({ mid: +mid })
     return [null, normalBv]
@@ -44,9 +44,9 @@ export const fetchVideo = async (bv: string): PRes<VideoSql> => {
       type: 'bangumi',
       coin,
       danmaku,
-      like,
+      likes: like,
       reply,
-      view,
+      views: view,
       pic,
       up_name: up_info.uname,
       up_mid: up_info.mid
