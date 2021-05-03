@@ -63,6 +63,6 @@ export const getUpCount = async (where?: Where) => {
 }
 
 export const getCreatedCount = async (start: string, end: string) => {
-  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as len from ${ UP_TABLE } created BETWEEN '${ start }' and '${ end }' group by date_format(created, '%Y-%m-%d')`
+  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as len from ${ UP_TABLE } where created BETWEEN '${ start }' and '${ end }' group by date_format(created, '%Y-%m-%d')`
   return $mysql.query<{ date: string, len: number }>(UP_TABLE).find(query)
 }

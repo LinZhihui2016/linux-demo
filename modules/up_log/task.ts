@@ -16,7 +16,7 @@ export const upLogTask = async () => {
     const [err, list] = await getListById<{ MID: number, ID: number }>(allList, ['mid', 'id']);
     if (err) return
     for (const item of list!) {
-      await sleep(8000)
+      await sleep(10000)
       const { ID, MID } = item
       const [, data] = await createdAndUpdated(MID, true)
       if (data) {
