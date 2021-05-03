@@ -1,5 +1,5 @@
 import { scriptStart } from "../../helper";
-import { getCreatedInWeek } from "../../modules/up/api";
+import { getCreatedInWeek } from "../../modules/sql/api";
 
 const temp = async () => {
   const res = await getCreatedInWeek({})

@@ -32,21 +32,24 @@ export const getCount: Action = async ({ user }) => {
 
 export const getCreatedInWeek: Action = async () => {
   const day = getDays();
-  const start = day[0]
-  const end = day.slice(-1)[0]
+  const end = day[0]
+  const start = day.slice(-1)[0]
   const up = await upCreatedCount(start, end)
   const video = await videoCreatedCount(start, end)
   if (up[0]) return error(ErrBase.mysql读取失败, up[0].message)
   if (video[0]) return error(ErrBase.mysql读取失败, video[0].message)
+  console.log(up,video)
   const $up = up[1]
   const $video = video[1]
   const map = new Map<string, { up: number, video: number }>()
   $up.forEach(({ date, up }) => {
+    console.log(date, up)
     const v: { up: number, video: number } = map.get(date) || { up: 0, video: 0 }
     v.up = up
     map.set(date, v)
   })
   $video.forEach(({ date, video }) => {
+    console.log(date, video)
     const v: { up: number, video: number } = map.get(date) || { up: 0, video: 0 }
     v.video = video
     map.set(date, v)
