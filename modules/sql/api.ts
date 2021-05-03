@@ -1,5 +1,5 @@
-import { getUpCount } from "../up/mysql";
-import { getVideoCount } from "../video/mysql";
+import { getCreatedCount as upCreatedCount, getUpCount } from "../up/mysql";
+import { getCreatedCount as videoCreatedCount, getVideoCount } from "../video/mysql";
 import { getUpFansLength } from "../up_fans/mysql";
 import { Action } from "../../type";
 import { getVideoFansLength } from "../video_fans/mysql";
@@ -7,6 +7,7 @@ import { getRankDateLength } from "../rank/mysql";
 import { error, success } from "../../helper";
 import { ErrBase } from "../../util/error";
 import { UP_FANS_MAX, VIDEO_FANS_MAX } from "../../util/magic";
+import { getDays } from "../../util";
 
 export const getCount: Action = async ({ user }) => {
   const [err, upCount] = await getUpCount()
@@ -27,4 +28,32 @@ export const getCount: Action = async ({ user }) => {
   } catch (e) {
     return error(ErrBase.mysql读取失败, e.message)
   }
+}
+
+export const getCreatedInWeek: Action = async () => {
+  const day = getDays();
+  const start = day[0]
+  const end = day.slice(-1)[0]
+  const up = await upCreatedCount(start, end)
+  const video = await videoCreatedCount(start, end)
+  if (up[0]) return error(ErrBase.mysql读取失败, up[0].message)
+  if (video[0]) return error(ErrBase.mysql读取失败, video[0].message)
+  const $up = up[1]
+  const $video = video[1]
+  const map = new Map<string, { up: number, video: number }>()
+  $up.forEach(({ date, up }) => {
+    const v: { up: number, video: number } = map.get(date) || { up: 0, video: 0 }
+    v.up = up
+    map.set(date, v)
+  })
+  $video.forEach(({ date, video }) => {
+    const v: { up: number, video: number } = map.get(date) || { up: 0, video: 0 }
+    v.video = video
+    map.set(date, v)
+  })
+  const data = day.map(date => {
+    const v = map.get(date) || { up: 0, video: 0 }
+    return { date, ...v }
+  })
+  return success(data)
 }

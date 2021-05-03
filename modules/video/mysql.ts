@@ -72,6 +72,6 @@ export const getVideoCount = async (where?: Where) => {
 }
 
 export const getCreatedCount = async (start: string, end: string) => {
-  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as len from ${VIDEO_TABLE} WHERE type != 'deleted' and created BETWEEN '${ start }' and '${ end }' group by date_format(created, '%Y-%m-%d')`
-  return $mysql.query<{ date: string, len: number }>(VIDEO_TABLE).find(query)
+  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as video from ${VIDEO_TABLE} WHERE type != 'deleted' and created BETWEEN '${ start }' and '${ end }' group by date_format(created, '%Y-%m-%d') ORDER BY date DESC`
+  return $mysql.query<{ date: string, video: number }>(VIDEO_TABLE).find(query)
 }
