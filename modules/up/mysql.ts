@@ -61,3 +61,8 @@ export const getChartList = async (orderBy: string) => {
 export const getUpCount = async (where?: Where) => {
   return $mysql.query<{ len: number }>(UP_TABLE).where(where || '').count().find()
 }
+
+export const getCreatedCount = async (start: string, end: string) => {
+  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as len from ${ UP_TABLE } and created BETWEEN '${ start }' and '${ end }' group by date_format(created, '%Y-%m-%d')`
+  return $mysql.query<{ date: string, len: number }>(UP_TABLE).find(query)
+}

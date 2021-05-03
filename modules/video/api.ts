@@ -1,12 +1,13 @@
 import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrVideo } from "../../util/error";
-import { getChartList, getListBySort, getListByUpdated, getVideo } from "./mysql";
+import { getChartList, getCreatedCount, getListBySort, getListByUpdated, getVideo } from "./mysql";
 import { fansVideo, fansVideoList, unfansVideo } from "../video_fans/mysql";
 import { videoSet, videoSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
 import { ListQuery } from "../../tools/mysql/type";
 import { notInArr } from "../../util";
+import dayjs from "dayjs";
 
 export const postAdd: Action<{ bv: string }> = async ({ bv }) => {
   const [err] = await videoSetAdd(bv, 'storage')
@@ -53,5 +54,10 @@ export const getList: Action<ListQuery & { fans: number }> = async (query) => {
 export const getChart: Action<{ key: string }> = async ({ key }) => {
   const sortArr = ['views', 'coin', 'likes', 'reply', 'danmaku']
   const [err, list] = await getChartList(notInArr(sortArr, key))
+  return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
+}
+
+export const getCreatedInWeek: Action = async () => {
+  const [err, list] = await getCreatedCount(dayjs().subtract(8, 'day').format('YYYY-MM-DD'), dayjs().subtract(1, 'day').format('YYYY-MM-DD'))
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }

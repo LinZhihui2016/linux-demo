@@ -83,7 +83,7 @@ export class Query<T> {
     return this
   }
 
-  find(): MysqlPromise<T> {
-    return new Promise(resolve => this.connection.query(this.sql(), mysqlRes(resolve)))
+  find(query?: string): MysqlPromise<T> {
+    return new Promise(resolve => this.connection.query(query || this.sql(), mysqlRes(resolve)))
   }
 }

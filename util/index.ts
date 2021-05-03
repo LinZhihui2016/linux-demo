@@ -13,6 +13,16 @@ export const isArr = <T>(arr: T | T[]): T[] => Array.isArray(arr) ? arr : [arr]
 
 export const today = () => new Date().toLocaleDateString()
 export const yesterday = () => dayjs().subtract(1, "day").format('YYYY-MM-DD')
+export const getDays = (count = 7) => {
+  let today = dayjs()
+  const day: string[] = []
+  for (let i = 0; i < count; i++) {
+    today = today.subtract(1, 'day')
+    const str = today.format('YYYY-MM-DD')
+    day.push(str)
+  }
+  return day
+}
 export const sleep = (ms: number) => {
   sleepChalk(ms)
   return new Promise<void>(resolve => setTimeout(() => resolve(), ms))

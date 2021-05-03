@@ -1,7 +1,8 @@
 import { scriptStart } from "../../helper";
-import { getRatioInWeek } from "../../modules/rank/api";
+import { getCreatedInWeek } from "../../modules/up/api";
 
 const temp = async () => {
-  await getRatioInWeek({})
+  const res = await getCreatedInWeek({})
+  console.log(res)
 }
 scriptStart(temp)

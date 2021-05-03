@@ -1,13 +1,14 @@
 import { Action } from "../../type";
 import { error, success } from "../../helper";
 import { ErrBase, ErrUp } from "../../util/error";
-import { getChartList, getListBySort, getListByUpdated, getUp } from "./mysql";
+import { getChartList, getCreatedCount, getListBySort, getListByUpdated, getUp } from "./mysql";
 import { fansUp, fansUpList, unfansUp } from "../up_fans/mysql";
 import { upSetAdd } from "./redis";
 import { $redis } from "../../tools/redis";
 import { videoSet } from "../video/redis";
 import { ListQuery } from "../../tools/mysql/type";
 import { notInArr } from "../../util";
+import dayjs from "dayjs";
 
 export const postAdd: Action<{ mid: number }> = async ({ mid }) => {
   const [err] = await upSetAdd(mid + '', 'storage')
@@ -54,5 +55,10 @@ export const getList: Action<ListQuery & { fans: number }> = async (query) => {
 export const getChart: Action<{ key: string }> = async ({ key }) => {
   const sortArr = ['follower', 'archive', 'likes']
   const [err, list] = await getChartList(notInArr(sortArr, key))
+  return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
+}
+
+export const getCreatedInWeek: Action = async () => {
+  const [err, list] = await getCreatedCount(dayjs().subtract(8, 'day').format('YYYY-MM-DD'), dayjs().subtract(1, 'day').format('YYYY-MM-DD'))
   return err ? error(ErrBase.mysql读取失败, err.message) : success(list)
 }
