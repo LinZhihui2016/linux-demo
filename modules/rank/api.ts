@@ -8,6 +8,7 @@ import { getRank, getRankByDates, getRankRatioByDate, saveRank } from "./mysql";
 import { getListByBv } from "../video/mysql";
 import { getDays, toInt, yesterday } from "../../util";
 import { $date } from "../../util/date";
+import dayjs from "dayjs";
 
 export const postUpdate: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
   if (!rid) return error(ErrBase.参数错误)
@@ -56,7 +57,9 @@ export const getRatio: Action<{ date?: string }> = async ({ date }) => {
 }
 
 export const getRatioInWeek: Action = async () => {
-  const day = getDays();
+  const end = dayjs().subtract(1, "day")
+  const start = end.subtract(7, 'day')
+  const day = getDays(start, end);
   const [e, list] = await getRankByDates(day);
   const data: Type.Obj<{ date: string, value: number | null }[]> = {}
   day.forEach(date => {

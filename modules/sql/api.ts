@@ -8,6 +8,7 @@ import { error, success } from "../../helper";
 import { ErrBase } from "../../util/error";
 import { UP_FANS_MAX, VIDEO_FANS_MAX } from "../../util/magic";
 import { getDays } from "../../util";
+import dayjs from "dayjs";
 
 export const getCount: Action = async ({ user }) => {
   const [err, upCount] = await getUpCount()
@@ -31,19 +32,18 @@ export const getCount: Action = async ({ user }) => {
 }
 
 export const getCreatedInWeek: Action = async () => {
-  const day = getDays();
-  const end = day[0]
-  const start = day.slice(-1)[0]
+  const end = dayjs()
+  const start = end.subtract(7, 'day')
+  const day = getDays(start, end);
   const up = await upCreatedCount(start, end)
   const video = await videoCreatedCount(start, end)
   if (up[0]) return error(ErrBase.mysql读取失败, up[0].message)
   if (video[0]) return error(ErrBase.mysql读取失败, video[0].message)
-  console.log(up,video)
+  console.log(up, video)
   const $up = up[1]
   const $video = video[1]
   const map = new Map<string, { up: number, video: number }>()
   $up.forEach(({ date, up }) => {
-    console.log(date, up)
     const v: { up: number, video: number } = map.get(date) || { up: 0, video: 0 }
     v.up = up
     map.set(date, v)

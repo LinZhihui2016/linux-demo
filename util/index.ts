@@ -1,5 +1,5 @@
 import { sleepChalk } from "./chalk";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { Type } from "../type";
 
 export const arrayExclude = <T>(target: T[], exclude: T[]): T[] => {
@@ -13,16 +13,17 @@ export const isArr = <T>(arr: T | T[]): T[] => Array.isArray(arr) ? arr : [arr]
 
 export const today = () => new Date().toLocaleDateString()
 export const yesterday = () => dayjs().subtract(1, "day").format('YYYY-MM-DD')
-export const getDays = (count = 7) => {
-  let today = dayjs()
+export const format = (dayjs: Dayjs) => dayjs.format('YYYY-MM-DD')
+export const getDays = (start: Dayjs, end: Dayjs) => {
+  let $start = start.clone()
   const day: string[] = []
-  for (let i = 0; i < count; i++) {
-    today = today.subtract(1, 'day')
-    const str = today.format('YYYY-MM-DD')
-    day.push(str)
+  while (format(end) !== format($start)) {
+    day.push(format($start));
+    $start = $start.add(1, 'day')
   }
   return day
-}
+};
+
 export const sleep = (ms: number) => {
   sleepChalk(ms)
   return new Promise<void>(resolve => setTimeout(() => resolve(), ms))
