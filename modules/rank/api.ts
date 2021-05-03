@@ -50,7 +50,7 @@ export const getRatio: Action<{ date?: string }> = async ({ date }) => {
   const [err, data] = await getRankRatioByDate($date)
   if (err) return error(ErrRank.获取排行榜失败, err.sql)
   const $data = data.map(i => {
-    return { value: i.COUNT_IN_0, name: i.RID === RankId.全站 ? '其他' : RankId[i.RID] }
+    return { value: i.COUNT_IN_0, name: +i.RID === +RankId.全站 ? '其他' : RankId[i.RID] }
   })
   $data.sort((a, b) => a.value - b.value)
   return success($data)
