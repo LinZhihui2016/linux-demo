@@ -19,9 +19,12 @@ export const countRank = async (rankList: RankSql[], date: string = $date(new Da
   map.forEach((list, rid) => {
     countMap.set(rid, list.filter(bv => mainList.includes(bv)).length)
   })
+  let j = 100;
   for (const i of countMap) {
     const [rid, count_in_0] = i
+    j = j - count_in_0
     await $mysql.update('video_rank', { count_in_0 }, new Where().eq('date', date).eq('rid', rid))
   }
-  await $mysql.update('video_rank', { count_in_0: -1 }, new Where().eq('date', date).eq('rid', mainRid))
+
+  await $mysql.update('video_rank', { count_in_0: j }, new Where().eq('date', date).eq('rid', mainRid))
 }

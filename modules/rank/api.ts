@@ -4,10 +4,11 @@ import { error, success } from "../../helper";
 import { ErrBase, ErrRank } from "../../util/error";
 import { getRankCache, setRankCache } from "./redis";
 import { fetchRank } from "./fetch";
-import { getRank, getRankRatioByDate, saveRank } from "./mysql";
+import { getRank, getRankByDates, getRankRatioByDate, saveRank } from "./mysql";
 import { getListByBv } from "../video/mysql";
 import { toInt, yesterday } from "../../util";
 import { $date } from "../../util/date";
+import dayjs from "dayjs";
 
 export const postUpdate: Action<{ rid: RankId }> = async ({ rid, noCache }) => {
   if (!rid) return error(ErrBase.参数错误)
@@ -48,9 +49,32 @@ export const getRatio: Action<{ date?: string }> = async ({ date }) => {
   const $date = date || yesterday()
   const [err, data] = await getRankRatioByDate($date)
   if (err) return error(ErrRank.获取排行榜失败, err.sql)
-  const $data = data.filter(i => +i.RID !== +RankId.全站).map(i => {
-    return { value: i.COUNT_IN_0, name: RankId[i.RID] }
+  const $data = data.map(i => {
+    return { value: i.COUNT_IN_0, name: i.RID === RankId.全站 ? '其他' : RankId[i.RID] }
   })
   $data.sort((a, b) => a.value - b.value)
   return success($data)
+}
+
+export const getRatioInWeek: Action = async () => {
+  let today = dayjs()
+  const day: string[] = []
+  for (let i = 0; i < 7; i++) {
+    today = today.subtract(1, 'day')
+    const str = today.format('YYYY-MM-DD')
+    day.push(str)
+  }
+  const [e, list] = await getRankByDates(day);
+  const data: Type.Obj<{ date: string, value: number | null }[]> = {}
+  day.forEach(date => {
+    list.filter(i => i.DATE === date).forEach(item => {
+      const { RID, COUNT_IN_0 } = item
+      const name = RankId[RID]
+      if (!data[name]) {
+        data[name] = []
+      }
+      data[name]!.push({ date, value: COUNT_IN_0 || 0 })
+    })
+  })
+  return e ? error(ErrRank.获取排行榜失败, e.message) : success(data)
 }
