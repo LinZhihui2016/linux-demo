@@ -69,7 +69,7 @@ export const getRatioInWeek: Action = async () => {
   day.forEach(date => {
     list.filter(i => i.DATE === date).forEach(item => {
       const { RID, COUNT_IN_0 } = item
-      const name = RankId[RID]
+      const name = +RID === +RankId.全站 ? '其他' : RankId[RID]
       if (!data[name]) {
         data[name] = []
       }
