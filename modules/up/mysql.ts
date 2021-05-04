@@ -4,7 +4,7 @@ import { Where } from "../../tools/mysql/where";
 import { $mysql } from "../../tools/mysql";
 import { Paging, paging } from "../../tools/mysql/helper";
 import { getAllUpInFans } from "../up_fans/mysql";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { format } from "../../util";
 
 const UP_TABLE = 'up'
@@ -64,7 +64,10 @@ export const getUpCount = async (where?: Where) => {
   return $mysql.query<{ len: number }>(UP_TABLE).where(where || '').count().find()
 }
 
-export const getCreatedCount = async (start: Dayjs, end: Dayjs) => {
-  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as up from ${ UP_TABLE } where created BETWEEN '${ format(start) }' and '${ format(end) }' group by date_format(created, '%Y-%m-%d') ORDER BY date DESC`
-  return $mysql.query<{ date: string, up: number }>(UP_TABLE).find(query)
+export const getCountByDate = async (type: 'updated' | 'created', start: Dayjs = dayjs(), end: Dayjs = dayjs().add(1, 'day')) => {
+  return $mysql.query<{ len: number, date: string }>(UP_TABLE)
+      .select([[`date_format(${ type }, '%Y-%m-%d')`, 'date'], [`count(*)`, 'len']])
+      .where(new Where().between(`${ type }`, format(start), format(end)))
+      .groupBy('date')
+      .find()
 }

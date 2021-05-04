@@ -40,9 +40,15 @@ export class Query<T> {
     return ['LIMIT', _limit].join(' ')
   }
 
+  get $groupBy() {
+    const { _groupBy } = this
+    if (!_groupBy) return
+    return ['GROUP BY', _groupBy].join(' ')
+  }
+
   sql() {
-    const { $from, $select, $where, $orderBy, $limit } = this
-    return [$select, $from, $where, $orderBy, $limit].filter(Boolean).join(' ')
+    const { $from, $select, $where, $orderBy, $limit, $groupBy } = this
+    return [$select, $from, $where, $orderBy, $limit, $groupBy].filter(Boolean).join(' ')
   }
 
   distinct(flag: boolean = true) {
@@ -57,7 +63,7 @@ export class Query<T> {
 
   select(k: string | (string | [string, string])[]) {
     const _k = (Array.isArray(k) ? k : [k]).map(i => Array.isArray(i) ? i.join(' as ') : i)
-    const _select = _k.join(',').toUpperCase()
+    const _select = _k.join(',')
     this._select = _select || '*'
     return this
   }
@@ -80,6 +86,13 @@ export class Query<T> {
     } else {
       this._orderBy.push([key, by].join(' '))
     }
+    return this
+  }
+
+  _groupBy = ''
+
+  groupBy(key: string) {
+    this._groupBy = key
     return this
   }
 

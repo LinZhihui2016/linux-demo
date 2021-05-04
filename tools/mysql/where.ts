@@ -13,7 +13,7 @@ export class Where {
     return this
   }
 
-  between(key: string, min: number, max: number, not = false) {
+  between(key: string, min: number | string, max: number | string, not = false) {
     this.arr.push(not ? `not ` : '' + `${ key } between ${ $mysql.connection.escape(min) } and ${ $mysql.connection.escape(max) }`)
     return this
   }

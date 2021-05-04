@@ -4,7 +4,7 @@ import { $mysql } from "../../tools/mysql";
 import { PRes } from "../../type";
 import { paging, Paging } from "../../tools/mysql/helper";
 import { getAllVideoInFans } from "../video_fans/mysql";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { format } from "../../util";
 
 const VIDEO_TABLE = 'video'
@@ -73,7 +73,10 @@ export const getVideoCount = async (where?: Where) => {
   return $mysql.query<{ len: number }>(VIDEO_TABLE).where($where).count().find()
 }
 
-export const getCreatedCount = async (start: Dayjs, end: Dayjs) => {
-  const query = `select date_format(created, '%Y-%m-%d') as date, count(*) as video from ${VIDEO_TABLE} WHERE type != 'deleted' and created BETWEEN '${ format(start) }' and '${ format(end) }' group by date_format(created, '%Y-%m-%d') ORDER BY date DESC`
-  return $mysql.query<{ date: string, video: number }>(VIDEO_TABLE).find(query)
+export const getCountByDate = async (type: 'updated' | 'created', start: Dayjs = dayjs(), end: Dayjs = dayjs().add(1, 'day')) => {
+  return $mysql.query<{ len: number, date: string }>(VIDEO_TABLE)
+      .select([[`date_format(${ type }, '%Y-%m-%d')`, 'date'], [`count(*)`, 'len']])
+      .where(new Where().between(`${ type }`, format(start), format(end)))
+      .groupBy('date')
+      .find()
 }
