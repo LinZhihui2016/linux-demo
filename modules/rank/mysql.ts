@@ -19,6 +19,7 @@ export const saveRank = async (list: string[], rid: RankId, date: string) => {
 export const getRank = async (rid: RankId, date: string): PRes<string> => {
   const where = new Where().eq('rid', rid || '0').eq('date', date || $date(new Date()))
   const [err, list] = await $mysql.query<{ LIST: string }>(VIDEO_RANK_TABLE).select('list').where(where).find()
+  console.log(err,list)
   if (err) return [err, null]
   if (list.length !== 1) return [new Error('日期或rid错误'), null]
   return [null, list[0].LIST]

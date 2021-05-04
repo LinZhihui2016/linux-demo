@@ -61,10 +61,20 @@ export class Query<T> {
     return this
   }
 
+  upperCase = true
+
+  case(upperCase = false) {
+    this.upperCase = upperCase
+    return this
+  }
+
   select(k: string | (string | [string, string])[]) {
     const _k = (Array.isArray(k) ? k : [k]).map(i => Array.isArray(i) ? i.join(' as ') : i)
     const _select = _k.join(',')
     this._select = _select || '*'
+    if (this.upperCase) {
+      this._select = this._select.toUpperCase()
+    }
     return this
   }
 
