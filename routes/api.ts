@@ -4,8 +4,8 @@ import { Action, Type } from "../type";
 import { Express } from "express";
 import { $date } from "../util/date";
 
-export const apiIndex = (app: Express, dirname: string) => fs.readdirSync(path.join(dirname, 'modules')).forEach(module => {
-  const apiFile = path.join(dirname, 'modules', module, 'api.ts')
+export const apiIndex = (app: Express, dirname: string, moduleName: string) => fs.readdirSync(path.join(dirname, moduleName)).forEach(module => {
+  const apiFile = path.join(dirname, moduleName, module, 'api.ts')
   const isExists = fs.existsSync(apiFile)
   if (!isExists) return
   const actions = require(apiFile) as Type.Obj<Action<any>>

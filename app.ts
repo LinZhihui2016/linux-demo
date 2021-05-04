@@ -36,12 +36,12 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use((req, res, next) => {
   req.body = Object.assign({}, req.query, req.body, { user: 1 })
   apiLog({ url: req.url, data: req.body })
   next()
 })
-app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(getParam)
 app.use((req, res, next) => {
@@ -49,7 +49,10 @@ app.use((req, res, next) => {
   next()
 })
 app.use('/', indexRouter);
-apiIndex(app, __dirname)
+
+apiIndex(app, __dirname, 'modules')
+apiIndex(app, __dirname, 'yezi')
+
 // app.use('/api', usersRouter);
 app.use((req, res, next) => next(createError(404)));
 

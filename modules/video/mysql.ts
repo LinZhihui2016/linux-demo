@@ -75,7 +75,7 @@ export const getVideoCount = async (where?: Where) => {
 export const getCountByDate = async (type: 'updated' | 'created', start: Dayjs = dayjs(), end: Dayjs = dayjs().add(1, 'day')) => {
   return $mysql.query<{ len: number, date: string }>(VIDEO_TABLE).case()
       .select([[`date_format(${ type }, '%Y-%m-%d')`, 'date'], [`count(*)`, 'len']])
-      .where(new Where().between(`${ type }`, format(start), format(end)))
+      .where(new Where().between(type, format(start), format(end)))
       .groupBy('date')
       .find()
 }

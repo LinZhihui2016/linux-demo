@@ -3,7 +3,7 @@ import mysql, { MysqlError } from 'mysql';
 import mysqlConf from '../../conf/mysql.json'
 import { Query } from "./query";
 import { Where } from "./where";
-import { Type } from "../../type";
+import { PRes, Type } from "../../type";
 import { $date } from "../../util/date";
 import { mysqlLog } from "../log4js/log";
 import { infoChalk } from "../../util/chalk";
@@ -41,7 +41,7 @@ export class Mysql {
     return new Query<T>(table, this.connection)
   }
 
-  insert(table: string, data: Type.Obj): MysqlPromise<any> {
+  insert(table: string, data: Type.Obj<any>): PRes<{ affectedRows: number }, MysqlError> {
     data.created = $date(new Date(), 4)
     data.updated = $date(new Date(), 4)
     const SET = this.connection.escape(data)
@@ -55,7 +55,7 @@ export class Mysql {
     return new Promise(resolve => this.connection.query(sql, mysqlRes(resolve)))
   }
 
-  update(table: string, data: Type.Obj, where?: string | Where): MysqlPromise<any> {
+  update(table: string, data: Type.Obj<any>, where?: string | Where): PRes<{ affectedRows: number }, MysqlError> {
     data.updated = $date(new Date(), 4)
     const SET = this.connection.escape(data)
     const WHERE = where ? 'WHERE ' + (where instanceof Where ? where.get() : where) : ''
@@ -63,12 +63,13 @@ export class Mysql {
     return new Promise(resolve => this.connection.query(sql, mysqlRes(resolve)))
   }
 
-  $(table: string, data: Type.Obj, where?: string | Where): MysqlPromise<any> {
+  $(table: string, data: Type.Obj<any>, where?: string | Where): PRes<{ affectedRows: number }, MysqlError> {
     return where ? this.update(table, data, where) : this.insert(table, data);
   }
 }
 
 export const $mysql = new Mysql(mysqlConf, 'bilibili')
+export const $yezi = new Mysql(mysqlConf, 'yezi')
 export const setupMysql: RequestHandler = (req, res, next) => {
   req.mysql = $mysql
   next()

@@ -29,6 +29,12 @@ export enum ErrBase {
   参数错误 = 1,
 }
 
-export type Err = ErrBase | ErrUp | ErrVideo | ErrRank
+export enum ErrYezi {
+  标签操作失败 = 1000001,
+  记录操作失败,
+  文本过长
+}
+
+export type Err = ErrBase | ErrUp | ErrVideo | ErrRank | ErrYezi
 
 

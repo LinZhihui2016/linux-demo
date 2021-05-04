@@ -1,6 +1,7 @@
 import mysql from "mysql";
 import { MysqlPromise, mysqlRes } from "./index";
 import { Where } from "./where";
+import { Type } from "../../type";
 
 export class Query<T> {
   constructor(public table: string, public connection: mysql.Connection) {
@@ -18,8 +19,30 @@ export class Query<T> {
     return [`SELECT`, _distinct && 'DISTINCT', _select].filter(Boolean).join(' ')
   }
 
+  join(table: string, on: Where | string, type: 'left' | 'right' | '' = '') {
+    this._join[table] = {
+      on,
+      type
+    }
+    return this
+  }
+
+  _join: Type.Obj<{ on: Where | string, type: 'left' | 'right' | '' }> = {}
+
   get $from() {
-    return [`FROM`, this.table].join(' ')
+    const v = [`FROM`, this.table]
+    if (Object.keys(this._join)) {
+      Object.keys(this._join).forEach(table => {
+        const { on, type } = this._join[table]!
+        const where = on instanceof Where ? on.get() : on;
+        v.push(type)
+        v.push('join')
+        v.push(table)
+        v.push('on')
+        v.push(where)
+      })
+    }
+    return v.join(' ')
   }
 
   get $orderBy() {
@@ -109,4 +132,5 @@ export class Query<T> {
   find(query?: string): MysqlPromise<T> {
     return new Promise(resolve => this.connection.query(query || this.sql(), mysqlRes(resolve)))
   }
+
 }
