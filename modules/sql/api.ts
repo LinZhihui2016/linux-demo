@@ -7,7 +7,7 @@ import { getRankDateLength } from "../rank/mysql";
 import { error, success } from "../../helper";
 import { ErrBase } from "../../util/error";
 import { UP_FANS_MAX, VIDEO_FANS_MAX } from "../../util/magic";
-import { getDays } from "../../util";
+import { format, getDays } from "../../util";
 import dayjs from "dayjs";
 
 export const getCount: Action = async ({ user }) => {
@@ -25,7 +25,8 @@ export const getCount: Action = async ({ user }) => {
     const obj = {
       up: { total: upCount[0].len, fans: upFansCount, fansMax: UP_FANS_MAX, update: upToday[0].len },
       video: { total: videoCount[0].len, fans: videoFansCount, fansMax: VIDEO_FANS_MAX, update: videoToday[0].len },
-      rank: { date: rankLength.length }
+      rank: { date: rankLength.length },
+      date: format(dayjs())
     }
     return success(obj)
   } catch (e) {
