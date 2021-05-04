@@ -69,7 +69,6 @@ export const getChartList = async (orderBy: string) => {
 }
 export const getVideoCount = async (where?: Where) => {
   const $where = where || new Where()
-  $where.notEq('type', 'deleted')
   return $mysql.query<{ len: number }>(VIDEO_TABLE).where($where).count().find()
 }
 
